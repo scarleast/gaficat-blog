@@ -1,0 +1,165 @@
+---
+// SearchModal - Pagefind-based local search with modal UI
+---
+
+<div id="search-modal" class="fixed inset-0 z-[100] hidden">
+  <!-- Backdrop -->
+  <div id="search-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+  <!-- Modal -->
+  <div class="fixed inset-0 flex items-start justify-center pt-[10vh] px-4">
+    <div class="relative w-full max-w-2xl bg-[var(--color-bg-card)] dark:bg-[var(--color-bg-card-dark)] rounded-xl shadow-2xl border border-[var(--color-border)] dark:border-[var(--color-border-dark)] overflow-hidden">
+      <!-- Search input -->
+      <div class="flex items-center px-4 border-b border-[var(--color-border)] dark:border-[var(--color-border-dark)]">
+        <svg class="w-5 h-5 text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          id="search-input"
+          type="text"
+          placeholder="搜索文章..."
+          class="w-full px-3 py-4 bg-transparent text-[var(--color-text)] dark:text-[var(--color-text-dark)] placeholder-[var(--color-text-secondary)] dark:placeholder-[var(--color-text-secondary-dark)] outline-none text-base"
+          autocomplete="off"
+        />
+        <kbd class="hidden sm:inline-flex items-center px-2 py-1 text-xs font-mono text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] bg-[var(--color-bg)] dark:bg-[var(--color-bg-dark)] rounded border border-[var(--color-border)] dark:border-[var(--color-border-dark)]">ESC</kbd>
+      </div>
+
+      <!-- Results -->
+      <div id="search-results" class="max-h-[60vh] overflow-y-auto p-2">
+        <div class="text-center py-8 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">
+          输入关键词开始搜索
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .search-result {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+  .search-result:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+  .dark .search-result:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+  .search-result-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text-heading);
+    margin-bottom: 0.25rem;
+  }
+  .dark .search-result-title {
+    color: var(--color-text-heading-dark);
+  }
+  .search-result-excerpt {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .dark .search-result-excerpt {
+    color: var(--color-text-secondary-dark);
+  }
+  .search-result mark {
+    background-color: rgba(48, 169, 222, 0.25);
+    color: inherit;
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+</style>
+
+<script is:inline>
+  function initSearch() {
+    var modal = document.getElementById('search-modal');
+    var backdrop = document.getElementById('search-backdrop');
+    var input = document.getElementById('search-input');
+    var results = document.getElementById('search-results');
+    if (!modal || !backdrop || !input || !results) return;
+
+    var pagefind = null;
+
+    async function loadPagefind() {
+      if (pagefind) return;
+      try {
+        pagefind = await import('/pagefind/pagefind.js');
+        await pagefind.init();
+      } catch (e) {
+        // Pagefind not available (dev mode or not yet generated)
+      }
+    }
+
+    function openModal() {
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      setTimeout(function() { input.focus(); }, 100);
+      loadPagefind();
+    }
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+      input.value = '';
+      results.innerHTML = '<div class="text-center py-8 text-sm" style="color: var(--color-text-secondary)">输入关键词开始搜索</div>';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        if (modal.classList.contains('hidden')) {
+          openModal();
+        } else {
+          closeModal();
+        }
+      }
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+
+    backdrop.addEventListener('click', closeModal);
+
+    var debounceTimer;
+    input.addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async function() {
+        var query = input.value.trim();
+        if (!query || !pagefind) {
+          results.innerHTML = '<div class="text-center py-8 text-sm" style="color: var(--color-text-secondary)">输入关键词开始搜索</div>';
+          return;
+        }
+
+        var search = await pagefind.search(query);
+        var resultsData = await Promise.all(
+          search.results.slice(0, 10).map(function(r) { return r.data(); })
+        );
+
+        if (resultsData.length === 0) {
+          results.innerHTML = '<div class="text-center py-8 text-sm" style="color: var(--color-text-secondary)">没有找到相关结果</div>';
+          return;
+        }
+
+        results.innerHTML = resultsData.map(function(r) {
+          return '<a href="' + r.url + '" class="search-result block">' +
+            '<div class="search-result-title">' + (r.meta && r.meta.title || '无标题') + '</div>' +
+            '<div class="search-result-excerpt">' + (r.excerpt || '') + '</div>' +
+          '</a>';
+        }).join('');
+
+        results.querySelectorAll('a').forEach(function(a) {
+          a.addEventListener('click', closeModal);
+        });
+      }, 200);
+    });
+  }
+
+  initSearch();
+  document.addEventListener('astro:after-swap', initSearch);
+</script>

@@ -1,0 +1,51 @@
+---
+// ScrollTop - fixed bottom-right button to scroll back to top
+---
+
+<button
+  id="scroll-top-btn"
+  type="button"
+  aria-label="回到顶部"
+  class="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-[var(--color-primary)] dark:bg-[var(--color-accent)] text-white shadow-lg opacity-0 translate-y-4 pointer-events-none transition-all duration-300 hover:scale-110 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+>
+  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+  </svg>
+</button>
+
+<script>
+  function initScrollTop() {
+    const btn = document.getElementById('scroll-top-btn');
+    if (!btn) return;
+
+    let ticking = false;
+
+    function updateVisibility() {
+      if (window.scrollY > 300) {
+        btn.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+        btn.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+      } else {
+        btn.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+        btn.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+      }
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(updateVisibility);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Set initial state
+    updateVisibility();
+  }
+
+  initScrollTop();
+  document.addEventListener('astro:after-swap', initScrollTop);
+</script>

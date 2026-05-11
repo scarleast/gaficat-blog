@@ -1,0 +1,356 @@
+---
+title: 给你的fluid主题加入一言吧！
+date: '2020-09-27 20:41:41'
+abbrlink: 11640910
+tags:
+  - 教程
+  - hexo
+categories:
+  - 教程
+  - hexo
+math: false
+toc: true
+---
+
+import VideoPlayer from '../../../components/media/VideoPlayer.astro';
+
+# 摘要
+
+你是否想过，在别人访问你网站的时候，能动态的展示一句话呢？这句话可能是根据访客的地理位置、时间、天气返回的诗句，可能是网抑云上生而为人我很抱歉的评论？本篇文章介绍了如何给hexo的fluid主题的打字机特效插入Hitokoto和今日诗词，实现上面效果。
+
+{/* more */}
+
+# 前言
+
+你是否想过，在别人访问你网站的时候，能动态的展示一句话呢？这句话可能是根据访客的地理位置、时间、天气返回的诗句，可能是网抑云上生而为人我很抱歉的评论？本文介绍的[Hitokoto](https://hitokoto.cn/)和[今日诗词](https://www.jinrishici.com/)（这俩玩意儿在本文的后续中就称作**一言**吧），就是干这个事儿的。
+
+一言的API，实际上是提供了一个JavaScript脚本，向网页html文件中的某个位置插入这个JavaScript脚本，就会在用户访问页面的时候自动调用，获取相应的语句并显示出来。之前，我网站的主题没有什么动态效果，副标题是直接显示的，所以我简单看了一下主题的源码，在副标题的位置很顺利插入了[今日诗词](https://www.jinrishici.com/)。但我最近给hexo更换了新的主题（[fluid](https://github.com/fluid-dev/hexo-theme-fluid)），这个主题的是自带打字机特效的（就是像打字一样，把一串文本一个一个显示出来），副标题的显示本身就是通过一个JavaScript脚本实现的，在一个JavaScript脚本中，就没办法直接插入一言提供的JavaScript脚本了。
+
+本篇文章介绍了如何给hexo的fluid主题的打字机特效（打字机特效就是下面这个动图显示的效果），插入一言，先来看一下效果吧~
+
+<VideoPlayer src="https://pic.gaficat.com/default/打字机一言效果.mov" title="打字机一言效果" />
+
+当然啦，也可以直接访问本站的[首页](https://www.gaficat.com)，查看实际的效果：随机调用[Hitokoto](https://hitokoto.cn/)和[今日诗词](https://www.jinrishici.com/)其中一个显示副标题。
+
+# 踩坑
+
+## JS脚本不能插入另一个JS脚本
+
+我完全不懂前端，一点不会JavaScript，所以一开始的想法是，在原来打字机特效的JavaScript脚本里面插入一言的JavaScript脚本不就行了？我也不改代码啥的，对吧！然而，这样肯定是不行的。
+
+首先，一个JavaScript脚本在html里面的格式如下：
+
+```javascript
+<script>
+alert("我的第一个 JavaScript");
+</script>
+```
+
+那么下面这样的格式肯定是有问题的：
+
+```javascript
+<script>
+    <script>alert("这是一言的JavaScript");</script>
+    alert("这是打字机特效的JavaScript");
+</script>
+```
+
+那咋样是允许的呢？下面这样：
+
+```javascript
+<script>
+  alert("这是一言的JavaScript");
+</script>
+
+<script>
+  alert("我的打字机特效的JavaScript");
+</script>
+```
+
+## 全局变量咋共享？
+
+按照上一小节说的，JavaScript允许的格式，是一言的JavaScript和打字机特效的JavaScript并列各自运行。那这两个JavaScript显示内容的逻辑是什么样的？
+
+```javascript
+<script>
+  alert("这是一言的JavaScript");
+    alert("我先获取今日随机的一句话");
+    alert("我获取到随机的一句话了，现在我显示这个内容");
+</script>
+
+<script>
+  alert("这是打字机特效的JavaScript");
+    alert("我设置要显示的内容为副标题");
+    alert("现在我显示相关内容");
+</script>
+```
+
+那这样搞，打字机是动态显示的，一言是静态直接显示内容的，这不就乱套了吗？能不能先把一言的JavaScript脚本跑一遍，然后获取到的结果存到一个全局变量里面，最后打字机特效的JavaScript脚本里面用这个全局变量不就行了嘛？逻辑就是下面这样：
+
+```javascript
+var global_somthing="";
+<script>
+  alert("这是一言的JavaScript");
+    alert("我先获取今日随机的一句话");
+    alert("我把global_somthing赋值为刚才获取到的一句话");
+</script>
+
+<script>
+  alert("接下来是打字机特效的JavaScript的内容");
+    alert("我把要显示的内容设为global_somthing变量");
+  alert("现在我开始动态显示");
+</script>
+```
+
+然而，理想很丰满，现实很残酷，一言提供的JavaScript脚本，是直接在脚本里面显示结果的，**我暂时没有找到办法，实现上面的逻辑，把一言JavaScript脚本获取到的结果，存到一个全局变量里面，给打字机特效的JavaScript使用。**
+
+> 这里我是真不懂，有大神可以指正哈。我感觉，不同JavaScript脚本之间的关系，不像python上不同的函数的关系，它更像是不同python文件各自跑起来之间的关系，是在不同的进程中的，他们之间的变量要共享，也许有办法，但是我这种小白肯定是没辙了。
+
+## Hitokoto终于搞定
+
+Hitokoto提供的JavaScript逻辑是这样的:
+
+```javascript
+<script>
+    alert("这是Hitokoto的JavaScript");
+    alert("我先通过http获取随机的一句话");
+    alert("现在我显示global_somthing的内容");
+</script>
+```
+
+所以我想，打字机的特效是一个JavaScript，一言也是JavaScript，我给他们整合到一起不就成了？逻辑就是下面这样：
+
+```javascript
+<script>
+  alert("这是我们整合的JavaScript");
+  var global_somthing="";
+
+    alert("接下来是Hitokoto JavaScript的内容");
+    alert("我先通过http获取随机的一句话");
+    alert("我把global_somthing赋值为刚才获取到的一句话");
+
+  alert("接下来是打字机特效的JavaScript的内容");
+    alert("我把要显示的内容设为global_somthing变量");
+  alert("现在我开始动态显示");
+</script>
+```
+
+结果当然是可行的，没有任何问题。
+
+## 今日诗词终于搞定
+
+那只使用Hitokoto感觉挺亏的，毕竟今日诗词提供的内容也挺棒的，也把今日诗词做一波整合呗？今日诗词的JavaScript逻辑是这样的：
+
+```javascript
+<script>
+  alert("这是今日诗词的JavaScript");
+    alert("我定义了一大堆的函数，用来获取相关内容");
+</script>
+
+<script>
+  alert("这是今日诗词的JavaScript");
+  alert("我调用上一个JavaScript脚本中定义的函数，显示相关内容");
+</script>
+```
+
+乍一看，这玩意儿跟Hitokoto长得不一样啊？你为啥不弄成Hitokoto那种逻辑，我整合也好整合，是吧。但是，相信今日诗词有他自己的考虑，我们暂时不吐槽他，想办法解决呗。
+
+> 我虽然看不懂今日诗词的JavaScript，但是感觉因为今日诗词是根据时间、IP地点、季节等信息，智能地返回一句诗词，所以不像Hitokoto直接通过http随机获取一句就完事了，他可能需要在访客端执行一些东西，才能完整的显示这些信息。
+
+那咋整麽，死马当活马医呗，所以我的逻辑是：
+
+```javascript
+<script>
+  alert("这是今日诗词的JavaScript");
+    alert("我定义了一大堆的函数，用来获取相关内容");
+</script>
+
+<script>
+  alert("这是我们整合的JavaScript");
+  var global_somthing="";
+
+  alert("接下来是今日诗词JavaScript的内容");
+    alert("我直接调用今日诗词JavaScript定义的获取诗句的函数A");
+  alert("我把global_somthing赋值为函数A的执行结果");
+
+    alert("接下来是打字机特效的JavaScript的内容");
+    alert("我把要显示的内容设为global_somthing变量");
+  alert("现在我开始动态显示");
+</script>
+```
+
+结果当然也是可行的，那在之前的小节，不是说过，不同JavaScript脚本之间的变量没办法共享吗？这里为啥可以不同的JavaScript脚本调用对方定义的函数？这里我感觉吧，懂的自然懂，不懂的跟我一样，一脸懵逼。总之呢，这么做，确实是可行的。
+
+## 随机调用Hitokoto和今日诗词
+
+那，打字机特效已经能和Hitokoto、今日诗词做整合了，那我想随机调用这俩种的一个，显示出来，咋处理呢？加一个随机数判断就完事了。
+
+```javascript
+<script>
+  alert("这是今日诗词的JavaScript");
+    alert("我定义了一大堆的函数，用来获取相关内容");
+</script>
+
+<script>
+  alert("这是我们整合的JavaScript");
+  var global_somthing="";
+    if(Math.random() < 0.5){
+    alert("接下来是Hitokoto JavaScript的内容");
+        alert("我先通过http获取随机的一句话");
+        alert("我把global_somthing赋值为刚才获取到的一句话");
+  }else{
+    alert("接下来是今日诗词JavaScript的内容");
+    alert("我直接调用今日诗词JavaScript定义的获取诗句的函数A");
+    alert("我把global_somthing赋值为函数A的执行结果");
+  }
+
+    alert("接下来是打字机特效的JavaScript的内容");
+    alert("我把要显示的内容设为global_somthing变量");
+  alert("现在我开始动态显示");
+</script>
+```
+
+实际测试，这个逻辑很完美。
+
+## 文章页的标题能不显示一言吗？
+
+按照上一节的逻辑，已经可以正常使用打字机特效显示一言了，但是我发现，hexo的fluid，打字机特效没有做太多的判断，会把文章页的文章名也判定为副标题，所以就会出现一个问题，首页、标签页、分类页、文章页都会显示打字机特效，但文章页的文章名也会判定为副标题，也会跟一长串一言显示的内容，这个肯定是我们不希望看到的。
+
+其实，这篇文章讲了这么多，截止目前，这么多代码最终都是要加到hexo主题的ejs文件中的，ejs文件我们可以理解为hexo主题的模板，这个模板可以根据hexo的结构，针对不同的页面做不同的布局，添加不同的JavaScript脚本。那么，就打字机特效这个场景，我们可以在ejs模板中，针对首页、标签页、分类页、文章页做不同的处理，比如首页我就显示网站的副标题+一言，其他页面我就只显示副标题。那么，打字机ejs模板的逻辑就是：
+
+```ejs
+<% if(is_home()) { %>
+  <script>
+    alert("这是今日诗词的JavaScript");
+    alert("我定义了一大堆的函数，用来获取相关内容");
+  </script>
+
+  <script>
+    alert("这是我们整合的JavaScript");
+    var global_somthing="";
+    if(Math.random() < 0.5){
+      alert("接下来是Hitokoto JavaScript的内容");
+      alert("我先通过http获取随机的一句话");
+      alert("我把global_somthing赋值为刚才获取到的一句话");
+    }else{
+      alert("接下来是今日诗词JavaScript的内容");
+      alert("我直接调用今日诗词JavaScript定义的获取诗句的函数A");
+      alert("我把global_somthing赋值为函数A的执行结果");
+    }
+
+    alert("接下来是打字机特效的JavaScript的内容");
+    alert("我把要显示的内容设为global_somthing变量");
+    alert("现在我开始动态显示");
+  </script>
+<% } else { %>
+    <script>
+  alert("这是打字机特效的JavaScript");
+    alert("我设置要显示的内容为副标题");
+    alert("现在我显示相关内容");
+</script>
+<% } %>
+```
+
+上面代码中的`is_home()`就是hexo提供的[辅助函数](https://hexo.io/zh-cn/docs/helpers.html)，上面逻辑，最终就会实现我的网站当前的效果，只有主页使用打字机特效显示一言的效果，其他页面正常使用打字机特效，显示副标题内容。
+
+# ToDo
+
+1. 找到fluid主题的打字机特效ejs模板文件。
+
+```bash
+scarleastdeMacBook-Pro:gaficat_blog scarleast$ sublime themes/hexo-theme-fluid-1.8.3/layout/_partial/plugins/typed.ejs
+```
+
+2. 复制我修改好的ejs文件。
+
+```ejs
+<% if(theme.fun_features.typing.enable && page.subtitle !== false){ %>
+  <%- js_ex(theme.static_prefix.typed, "/typed.min.js") %>
+
+  <% if(is_home()) { %>
+    <script type="text/javascript">
+        !function(e){var n,t={},o="jinrishici-token";function i(){return document.getElementById("jinrishici-sentence")||0!=document.getElementsByClassName("jinrishici-sentence").length}function c(){t.load(function(e){var n=document.getElementById("jinrishici-sentence"),t=document.getElementsByClassName("jinrishici-sentence");if(n&&(n.innerText=e.data.content),0!==t.length)for(var o=0;o<t.length;o++)t[o].innerText=e.data.content})}function r(e,n){var t=new XMLHttpRequest;t.open("get",n),t.withCredentials=!0,t.send(),t.onreadystatechange=function(n){if(4===t.readyState){var o=JSON.parse(t.responseText);"success"===o.status?e(o):console.error("今日诗词API加载失败，错误原因："+o.errMessage)}}}t.load=function(n){return e.localStorage&&e.localStorage.getItem(o)?function(e,n){return r(e,"https://v2.jinrishici.com/one.json?client=browser-sdk/1.2&X-User-Token="+encodeURIComponent(n))}(n,e.localStorage.getItem(o)):function(n){return r(function(t){e.localStorage.setItem(o,t.token),n(t)},"https://v2.jinrishici.com/one.json?client=browser-sdk/1.2")}(n)},e.jinrishici=t,i()?c():(n=function(){i()&&c()},"loading"!=document.readyState?n():document.addEventListener?document.addEventListener("DOMContentLoaded",n):document.attachEvent("onreadystatechange",function(){"complete"==document.readyState&&n()}))}(window); 
+    </script>
+
+    <script type="text/javascript">
+      if(Math.random() < 0.5){
+        jinrishici.load(function(result) {
+          var typed = new Typed('#subtitle', {
+          strings: [
+            '  ',
+            "<%- data.subtitle %>&nbsp;" + "<br><br>" + result.data.content + "<br>" + "&nbsp;&nbsp;&nbsp;—" + '【' + result.data.origin.dynasty + '】' + result.data.origin.author + '《' + result.data.origin.title + '》',
+          ],
+          cursorChar: "<%- theme.fun_features.typing.cursorChar %>",
+          typeSpeed: <%- theme.fun_features.typing.typeSpeed %>,
+          loop: <%- theme.fun_features.typing.loop %>,
+          });
+          typed.stop();
+          $(document).ready(function () {
+            $(".typed-cursor").addClass("h2");
+            typed.start();
+          }); 
+        }); 
+      }else{
+        fetch('https://v1.hitokoto.cn')
+        .then(response => response.json())
+        .then(data => {
+          if(data.from_who){
+            var typed = new Typed('#subtitle', {
+              strings: [
+                '  ',
+                "<%- data.subtitle %>&nbsp;" + "<br><br>" + data.hitokoto + "<br>" + "&nbsp;&nbsp;&nbsp;— " + data.from_who +'《' + data.from + '》',
+              ],
+              cursorChar: "<%- theme.fun_features.typing.cursorChar %>",
+              typeSpeed: <%- theme.fun_features.typing.typeSpeed %>,
+              loop: <%- theme.fun_features.typing.loop %>,
+            });
+            
+          }else{
+            var typed = new Typed('#subtitle', {
+              strings: [
+                '  ',
+                "<%- data.subtitle %>&nbsp;" + "<br><br>" + data.hitokoto + "<br>" + "&nbsp;&nbsp;&nbsp;— " + '《' + data.from + '》',
+              ],
+              cursorChar: "<%- theme.fun_features.typing.cursorChar %>",
+              typeSpeed: <%- theme.fun_features.typing.typeSpeed %>,
+              loop: <%- theme.fun_features.typing.loop %>,
+            });
+          }
+          typed.stop();
+          $(document).ready(function () {
+            $(".typed-cursor").addClass("h2");
+            typed.start();
+          });  
+        })
+        .catch(console.error)
+      }
+    </script>
+  <% } else { %>
+    <script>
+      var typed = new Typed('#subtitle', {
+        strings: [
+          '  ',
+          "<%- data.subtitle %>&nbsp;",
+        ],
+        cursorChar: "<%- theme.fun_features.typing.cursorChar %>",
+        typeSpeed: <%- theme.fun_features.typing.typeSpeed %>,
+        loop: <%- theme.fun_features.typing.loop %>,
+      });
+      typed.stop();
+      $(document).ready(function () {
+        $(".typed-cursor").addClass("h2");
+        typed.start();
+      });
+    </script>
+  <% } %>
+
+
+<% } %>
+
+```
+
+# 尾巴
+
+hexo的好处是，可以直接使用markdown来写文章，无需关注复杂的前端，因为有大神给你写好了各种主题。但是，没有主题是完美的，因为每个人的需求都不一样，你可能需要在网站的底下加上又拍云的logo，来蹭一波免费的额度；你可能看到了某个有意思的功能，需要修改一些代码，才能实现一些好玩的东西。
+
+很感谢[fluid](https://github.com/fluid-dev/hexo-theme-fluid)主题的开发者们，这个主题简洁、美观。并且我这样一个前端小白，提过很多很简单的Issues，这个主题的开发者也很耐心的作了回复。希望我这篇文章能帮到一些铁子吧，毕竟看到挺多铁子都提了关于整合Hitokoto的Issues。

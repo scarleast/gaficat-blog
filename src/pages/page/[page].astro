@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/home/PostCard.astro';
+
+export async function getStaticPaths() {
+  const POSTS_PER_PAGE = 10;
+  const allPosts = (await getCollection('posts'))
+    .sort((a, b) => {
+      const stickyDiff = (b.data.sticky ?? 0) - (a.data.sticky ?? 0);
+      if (stickyDiff !== 0) return stickyDiff;
+      return b.data.date.valueOf() - a.data.date.valueOf();
+    });
+
+  const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
+  const paths = [];
+
+  for (let i = 2; i <= totalPages; i++) {
+    paths.push({
+      params: { page: String(i) },
+      props: {
+        posts: allPosts.slice((i - 1) * POSTS_PER_PAGE, i * POSTS_PER_PAGE),
+        currentPage: i,
+        totalPages,
+      },
+    });
+  }
+
+  return paths;
+}
+
+const { posts, currentPage, totalPages } = Astro.props;
+---
+
+<BaseLayout title={`第 ${currentPage} 页 - 加菲猫的创客工坊`} description="分享各种电子设计DIY、物联网DIY、读书笔记、生活想法、流行钢琴、工作踩坑">
+  <main class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-2xl font-bold text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)] mb-8">
+      文章列表
+    </h1>
+
+    <div class="grid gap-6">
+      {posts.map((post: any) => (
+        <PostCard post={post} />
+      ))}
+    </div>
+
+    <!-- Pagination -->
+    <nav class="flex justify-center items-center gap-4 mt-12">
+      {currentPage > 2 ? (
+        <a
+          href={`/page/${currentPage - 1}.html`}
+          class="px-4 py-2 rounded-lg border border-[var(--color-border)] dark:border-[var(--color-border-dark)] text-[var(--color-text)] dark:text-[var(--color-text-dark)] hover:border-[var(--color-accent)] transition-colors"
+        >
+          ← 上一页
+        </a>
+      ) : (
+        <a
+          href="/"
+          class="px-4 py-2 rounded-lg border border-[var(--color-border)] dark:border-[var(--color-border-dark)] text-[var(--color-text)] dark:text-[var(--color-text-dark)] hover:border-[var(--color-accent)] transition-colors"
+        >
+          ← 上一页
+        </a>
+      )}
+
+      <span class="text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">
+        第 {currentPage} 页 / 共 {totalPages} 页
+      </span>
+
+      {currentPage < totalPages && (
+        <a
+          href={`/page/${currentPage + 1}.html`}
+          class="px-4 py-2 rounded-lg bg-[var(--color-primary)] dark:bg-[var(--color-primary-light)] text-white hover:opacity-90 transition-opacity"
+        >
+          下一页 →
+        </a>
+      )}
+    </nav>
+  </main>
+</BaseLayout>

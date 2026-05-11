@@ -1,0 +1,83 @@
+---
+// PostMeta - reusable inline display of date, categories, and tags
+
+interface Props {
+  date: Date;
+  categories: string[] | string[][] | string;
+  tags: string[];
+  readingTime?: string;
+}
+
+const { date, categories, tags, readingTime } = Astro.props;
+
+// Normalize categories for display
+function getCategories(cat: string[] | string[][] | string): string[] {
+  if (typeof cat === 'string') return cat ? [cat] : [];
+  if (Array.isArray(cat) && cat.length > 0) {
+    if (Array.isArray(cat[0])) return (cat as string[][]).map((c) => c.join('/'));
+    return cat as string[];
+  }
+  return [];
+}
+
+const categoryList = getCategories(categories);
+const formattedDate = date.toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">
+  <!-- Date -->
+  <span class="inline-flex items-center gap-1.5">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+    <time datetime={date.toISOString()}>{formattedDate}</time>
+  </span>
+
+  <!-- Reading time -->
+  {readingTime && (
+    <span class="inline-flex items-center gap-1.5">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      {readingTime}
+    </span>
+  )}
+
+  <!-- Categories -->
+  {categoryList.length > 0 && (
+    <span class="inline-flex items-center gap-1.5">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+      </svg>
+      {categoryList.map((cat, i) => (
+        <a
+          href={`/categories/${cat}.html`}
+          class="hover:text-[var(--color-accent)] transition-colors"
+        >
+          {cat}{i < categoryList.length - 1 ? ', ' : ''}
+        </a>
+      ))}
+    </span>
+  )}
+
+  <!-- Tags -->
+  {tags.length > 0 && (
+    <span class="inline-flex items-center gap-1.5 flex-wrap">
+      <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
+      </svg>
+      {tags.map((tag) => (
+        <a
+          href={`/tags/${tag}.html`}
+          class="px-2 py-0.5 rounded-full bg-[var(--color-bg)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] hover:text-[var(--color-accent)] transition-colors text-xs"
+        >
+          #{tag}
+        </a>
+      ))}
+    </span>
+  )}
+</div>

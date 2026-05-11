@@ -1,0 +1,103 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import ArticleHeader from '../components/post/ArticleHeader.astro';
+import Copyright from '../components/post/Copyright.astro';
+import PostNav from '../components/post/PostNav.astro';
+import TableOfContents from '../components/post/TableOfContents.astro';
+import ReadingProgress from '../components/common/ReadingProgress.astro';
+
+interface PostLink {
+  data: { title: string; abbrlink: string };
+}
+
+interface Props {
+  post: {
+    data: {
+      title: string;
+      date: Date;
+      categories: string[] | string[][] | string;
+      tags: string[];
+      abbrlink: string;
+      math?: boolean;
+      excerpt?: string;
+    };
+  };
+  headings: { depth: number; slug: string; text: string }[];
+  prevPost?: PostLink | null;
+  nextPost?: PostLink | null;
+}
+
+const { post, headings, prevPost, nextPost } = Astro.props;
+const { title, date, categories, tags, abbrlink, math = false, excerpt } = post.data;
+
+// Estimate reading time from content (rough Chinese text: ~400 chars/min)
+const content = await Astro.slots.render('default');
+const plainText = content.replace(/<[^>]*>/g, '').replace(/\s+/g, '');
+const readingTime = Math.max(1, Math.ceil(plainText.length / 400));
+const readingTimeStr = `${readingTime} 分钟`;
+
+const postUrl = `https://www.gaficat.com/posts/${abbrlink}.html`;
+const hasToc = headings && headings.filter((h) => h.depth >= 2 && h.depth <= 3).length > 0;
+---
+
+<BaseLayout
+  title={title}
+  description={excerpt}
+  type="article"
+  url={postUrl}
+  publishedTime={date.toISOString()}
+>
+  <ReadingProgress />
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 lg:py-12">
+    <div class="flex gap-10">
+      <!-- Main article column -->
+      <article class="flex-1 min-w-0 max-w-none lg:max-w-[var(--spacing-content-max)]">
+        <div class="bg-[var(--color-bg-card)] dark:bg-[var(--color-bg-card-dark)] border border-[var(--color-border)] dark:border-[var(--color-border-dark)] px-6 sm:px-8 lg:px-10 py-8 sm:py-10">
+          <ArticleHeader
+            title={title}
+            date={date}
+            categories={categories}
+            tags={tags}
+            readingTime={readingTimeStr}
+          />
+
+          <!-- Article content -->
+          <div class="prose">
+            <slot />
+          </div>
+
+          <!-- Copyright notice -->
+          <Copyright />
+
+          <!-- Prev / Next navigation -->
+          <PostNav
+            prevPost={prevPost ? { title: prevPost.data.title, abbrlink: prevPost.data.abbrlink } : undefined}
+            nextPost={nextPost ? { title: nextPost.data.title, abbrlink: nextPost.data.abbrlink } : undefined}
+          />
+        </div>
+      </article>
+
+      <!-- Sidebar - Table of Contents (hidden on mobile and when no headings) -->
+      {hasToc && (
+        <aside class="hidden lg:block w-[var(--spacing-sidebar)] shrink-0">
+          <TableOfContents headings={headings} />
+        </aside>
+      )}
+    </div>
+  </div>
+
+  <!-- Conditional MathJax loading for posts with math content -->
+  {math && (
+    <script is:inline>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        },
+      };
+    </script>
+  )}
+</BaseLayout>

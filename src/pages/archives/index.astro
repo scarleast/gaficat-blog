@@ -1,0 +1,56 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const allPosts = (await getCollection('posts'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Group by year
+const postsByYear = new Map<number, typeof allPosts>();
+allPosts.forEach((post) => {
+  const year = post.data.date.getFullYear();
+  if (!postsByYear.has(year)) postsByYear.set(year, []);
+  postsByYear.get(year)!.push(post);
+});
+
+const years = [...postsByYear.keys()].sort((a, b) => b - a);
+---
+
+<BaseLayout title="归档" description="所有文章按时间归档">
+  <main class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-3xl font-bold text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)] mb-8">
+      归档
+      <span class="text-lg font-normal text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] ml-2">
+        共 {allPosts.length} 篇
+      </span>
+    </h1>
+
+    <div class="space-y-10">
+      {years.map((year) => (
+        <section>
+          <h2 class="text-2xl font-bold text-[var(--color-primary)] dark:text-[var(--color-accent)] mb-4 border-b-2 border-[var(--color-accent)] pb-2 inline-block">
+            {year}
+          </h2>
+          <ul class="space-y-3">
+            {postsByYear.get(year)?.map((post) => {
+              const date = post.data.date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
+              return (
+                <li class="flex items-center gap-4">
+                  <time class="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] w-24 shrink-0">
+                    {date}
+                  </time>
+                  <a
+                    href={`/posts/${post.data.abbrlink}.html`}
+                    class="text-[var(--color-text)] dark:text-[var(--color-text-dark)] hover:text-[var(--color-accent)] dark:hover:text-[var(--color-accent)] transition-colors"
+                  >
+                    {post.data.title}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </main>
+</BaseLayout>

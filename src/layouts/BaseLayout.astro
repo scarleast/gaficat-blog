@@ -1,0 +1,79 @@
+---
+import Header from '../components/common/Header.astro';
+import Footer from '../components/common/Footer.astro';
+import ScrollTop from '../components/common/ScrollTop.astro';
+import SearchModal from '../components/common/SearchModal.astro';
+import PlyrInit from '../components/media/PlyrInit.astro';
+import OpenGraph from '../components/seo/OpenGraph.astro';
+import '../assets/styles/global.css';
+import '../assets/styles/typography.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  type?: 'website' | 'article';
+  image?: string;
+  url?: string;
+  publishedTime?: string;
+}
+
+const {
+  title = '加菲猫的创客工坊',
+  description,
+  type = 'website',
+  image,
+  url,
+  publishedTime,
+} = Astro.props;
+
+const isHome = Astro.url.pathname === '/';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Prevent dark mode FOUC -->
+    <script is:inline>
+      (function () {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <OpenGraph
+      title={title}
+      description={description}
+      type={type}
+      image={image}
+      url={url}
+      publishedTime={publishedTime}
+    />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <Header />
+    <main class:list={['flex-1', isHome ? '' : 'pt-16']}>
+      <slot />
+    </main>
+    <Footer />
+    <ScrollTop />
+    <SearchModal />
+    <PlyrInit />
+  </body>
+</html>

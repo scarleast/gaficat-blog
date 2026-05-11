@@ -1,0 +1,51 @@
+---
+// Bilibili - B站视频嵌入组件
+// Usage in MDX: <Bilibili bvid="BV1kb411t74w" />
+interface Props {
+  bvid?: string;
+  aid?: string;
+  page?: number;
+  aspectRatio?: string;
+}
+
+const { bvid, aid, page = 1, aspectRatio = '16/9' } = Astro.props;
+
+const src = bvid
+  ? `//player.bilibili.com/player.html?bvid=${bvid}&page=${page}&high_quality=1&danmaku=0`
+  : `//player.bilibili.com/player.html?aid=${aid}&page=${page}&high_quality=1&danmaku=0`;
+---
+
+<div class="bilibili-wrapper">
+  <div class="bilibili-container" style={`aspect-ratio: ${aspectRatio};`}>
+    <iframe
+      src={src}
+      scrolling="no"
+      frameborder="0"
+      allowfullscreen="true"
+      loading="lazy"
+      class="bilibili-iframe"
+    ></iframe>
+  </div>
+</div>
+
+<style>
+  .bilibili-wrapper {
+    margin: 1.5em 0;
+  }
+  .bilibili-container {
+    width: 100%;
+    max-width: 640px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    background: #000;
+  }
+  .bilibili-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>

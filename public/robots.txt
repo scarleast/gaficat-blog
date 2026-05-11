@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /archives
+Allow: /categories
+Allow: /tags
+Allow: /links
+Allow: /aboutme
+Sitemap: https://www.gaficat.com/sitemap-index.xml

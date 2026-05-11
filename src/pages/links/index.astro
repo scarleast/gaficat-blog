@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// Friend links data - migrated from Hexo Fluid theme config
+const links = [
+  { name: "又拍云", url: "https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral", desc: "CDN 加速服务", avatar: "/img/upyun_logo4.png" },
+];
+---
+
+<BaseLayout title="友情链接" description="友情链接">
+  <main class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-3xl font-bold text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)] mb-8">友情链接</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {links.map((link) => (
+        <a
+          href={link.url}
+          target="_blank"
+          rel="noopener"
+          class="flex items-center gap-4 p-4 rounded-lg bg-[var(--color-bg-card)] dark:bg-[var(--color-bg-card-dark)] border border-[var(--color-border)] dark:border-[var(--color-border-dark)] hover:border-[var(--color-accent)] dark:hover:border-[var(--color-accent)] hover:shadow-md transition-all"
+        >
+          <img src={link.avatar} alt={link.name} class="w-12 h-12 rounded-lg object-cover" />
+          <div>
+            <div class="font-medium text-[var(--color-text)] dark:text-[var(--color-text-dark)]">{link.name}</div>
+            <div class="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">{link.desc}</div>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <div class="mt-12 p-6 rounded-lg bg-[var(--color-bg-card)] dark:bg-[var(--color-bg-card-dark)] border border-[var(--color-border)] dark:border-[var(--color-border-dark)]">
+      <h2 class="text-xl font-semibold mb-4 text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)]">申请友链</h2>
+      <p class="text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">
+        欢迎交换友链，请在评论区或通过 GitHub 留下以下信息：
+      </p>
+      <ul class="mt-2 text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] list-disc list-inside space-y-1">
+        <li>站点名称</li>
+        <li>站点地址</li>
+        <li>站点描述</li>
+        <li>头像/Logo 地址</li>
+      </ul>
+    </div>
+  </main>
+</BaseLayout>

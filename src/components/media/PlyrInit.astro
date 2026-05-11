@@ -1,0 +1,28 @@
+---
+// PlyrInit - Loads Plyr CSS/JS and initializes players on the page
+// Only loads if the page contains [data-plyr] elements
+---
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr/dist/plyr.css" />
+<script>
+  function initPlyr() {
+    const players = document.querySelectorAll('[data-plyr]');
+    if (players.length === 0) return;
+
+    import('plyr').then(({ default: Plyr }) => {
+      Plyr.setup('[data-plyr]', {
+        controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'download'],
+        i18n: {
+          play: '播放',
+          pause: '暂停',
+          mute: '静音',
+          unmute: '取消静音',
+          download: '下载',
+        },
+      });
+    });
+  }
+
+  initPlyr();
+  document.addEventListener('astro:after-swap', initPlyr);
+</script>

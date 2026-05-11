@@ -1,0 +1,41 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  type?: 'website' | 'article';
+  image?: string;
+  url?: string;
+  publishedTime?: string;
+}
+
+const {
+  title,
+  description = '分享各种电子设计DIY、物联网DIY、读书笔记、生活想法、流行钢琴、工作踩坑',
+  type = 'website',
+  image,
+  url,
+  publishedTime,
+} = Astro.props;
+
+const siteTitle = '加菲猫的创客工坊';
+const fullTitle = title === siteTitle ? title : `${title} - ${siteTitle}`;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+
+<!-- Open Graph -->
+<meta property="og:type" content={type} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:site_name" content={siteTitle} />
+<meta property="og:locale" content="zh_CN" />
+{url && <meta property="og:url" content={url} />}
+{image && <meta property="og:image" content={image} />}
+{publishedTime && <meta property="article:published_time" content={publishedTime} />}
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+{image && <meta name="twitter:image" content={image} />}

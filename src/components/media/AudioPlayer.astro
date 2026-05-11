@@ -1,0 +1,42 @@
+---
+// AudioPlayer - Plyr-based audio player component
+// Usage in MDX: <AudioPlayer src="https://..." title="曲名" author="作者" />
+interface Props {
+  src: string;
+  title?: string;
+  author?: string;
+}
+
+const { src, title, author } = Astro.props;
+const label = [title, author].filter(Boolean).join(' - ');
+---
+
+<div class="audio-player-wrapper">
+  {title && (
+    <div class="audio-player-title">
+      {title}{author && <span class="audio-player-author"> — {author}</span>}
+    </div>
+  )}
+  <audio controls preload="metadata" data-plyr>
+    <source src={src} type="audio/mpeg" />
+  </audio>
+</div>
+
+<style>
+  .audio-player-wrapper {
+    margin: 1.5em 0;
+  }
+  .audio-player-title {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.25rem;
+  }
+  .dark .audio-player-title {
+    color: var(--color-text-secondary-dark);
+  }
+  .audio-player-wrapper audio {
+    width: 100%;
+    max-width: 480px;
+    border-radius: 6px;
+  }
+</style>

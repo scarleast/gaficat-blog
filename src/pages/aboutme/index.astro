@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="关于我" description="关于加菲猫的创客工坊">
+  <main class="max-w-3xl mx-auto px-4 py-12">
+    <article class="prose">
+      <h1>我是谁？</h1>
+
+      <div class="flex items-center gap-6 my-8">
+        <img
+          src="/img/avatar.jpg"
+          alt="Avatar"
+          class="w-24 h-24 rounded-full border-4 border-[var(--color-accent)]"
+        />
+        <div>
+          <h2 class="!mt-0 !mb-1">scarleast</h2>
+          <p class="!mb-0 text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">
+            创客 / 安全研究者 / 爱好音乐的理工男
+          </p>
+        </div>
+      </div>
+
+      <p>
+        欢迎来到加菲猫的创客工坊！这里是我的个人博客，记录各种有趣的技术探索和生活点滴。
+      </p>
+
+      <h2>关于本站</h2>
+      <p>
+        本站创建于 2019 年，主要分享以下内容：
+      </p>
+      <ul>
+        <li><strong>电子设计</strong> — STM32、Arduino、Mbed 等嵌入式开发</li>
+        <li><strong>物联网安全</strong> — IoT 设备安全研究和渗透测试</li>
+        <li><strong>音乐</strong> — 乐理学习和流行钢琴</li>
+        <li><strong>读书笔记</strong> — 各类书籍的阅读感悟</li>
+        <li><strong>生活随想</strong> — 日常生活的思考和记录</li>
+      </ul>
+
+      <h2>联系方式</h2>
+      <ul>
+        <li>GitHub: <a href="https://github.com/scarleast" target="_blank" rel="noopener">@scarleast</a></li>
+        <li>Email: 可通过 GitHub 联系</li>
+      </ul>
+
+      <h2>版权声明</h2>
+      <p>
+        本站所有原创文章采用
+        <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="noopener">
+          CC BY-NC-ND 4.0
+        </a>
+        协议发布。转载请注明出处。
+      </p>
+    </article>
+  </main>
+</BaseLayout>

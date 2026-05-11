@@ -1,0 +1,49 @@
+---
+// VideoPlayer - Plyr-based video player component
+// Usage in MDX: <VideoPlayer src="https://..." title="标题" poster="封面URL" />
+interface Props {
+  src: string;
+  title?: string;
+  poster?: string;
+  aspectRatio?: string; // e.g. "16/9", "4/3"
+}
+
+const { src, title, poster, aspectRatio = '16/9' } = Astro.props;
+---
+
+<div class="video-player-wrapper">
+  {title && (
+    <div class="video-player-title">{title}</div>
+  )}
+  <div class="video-player-container" style={`aspect-ratio: ${aspectRatio};`}>
+    <video controls preload="metadata" data-plyr poster={poster}>
+      <source src={src} />
+    </video>
+  </div>
+</div>
+
+<style>
+  .video-player-wrapper {
+    margin: 1.5em 0;
+  }
+  .video-player-title {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.25rem;
+  }
+  .dark .video-player-title {
+    color: var(--color-text-secondary-dark);
+  }
+  .video-player-container {
+    width: 100%;
+    max-width: 640px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+  }
+  .video-player-container video {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+</style>

@@ -1,0 +1,136 @@
+---
+// TableOfContents - generates nested heading links for sidebar
+// Headings come from Astro.props.headings with { depth, slug, text }
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+
+// Only include h2 and h3 for a clean TOC
+const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+
+// Determine if a heading is a sub-item (h3 after h2)
+function getHeadingLevel(depth: number): string {
+  return depth === 2 ? 'top' : 'sub';
+}
+---
+
+<nav
+  id="toc"
+  class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-thin"
+  aria-label="目录"
+>
+  <h2 class="text-sm font-semibold text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)] mb-4 uppercase tracking-wider">
+    目录
+  </h2>
+
+  {tocHeadings.length === 0 ? (
+    <p class="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">无标题</p>
+  ) : (
+    <ul class="space-y-1.5 text-sm">
+      {tocHeadings.map((heading) => (
+        <li
+          class:list={[
+            heading.depth === 3 && 'pl-4',
+          ]}
+        >
+          <a
+            href={`#${heading.slug}`}
+            data-toc-link
+            data-heading-slug={heading.slug}
+            class="block py-1 border-l-2 border-transparent pl-3 text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)] transition-colors leading-snug"
+          >
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+</nav>
+
+<script>
+  function initTOC() {
+    const tocLinks = document.querySelectorAll('[data-toc-link]');
+    if (tocLinks.length === 0) return;
+
+    // Collect all headings that have corresponding TOC links
+    const headingElements: { slug: string; el: HTMLElement }[] = [];
+    tocLinks.forEach((link) => {
+      const slug = link.getAttribute('data-heading-slug');
+      if (!slug) return;
+      const heading = document.getElementById(slug);
+      if (heading) {
+        headingElements.push({ slug, el: heading });
+      }
+    });
+
+    if (headingElements.length === 0) return;
+
+    let activeSlug = '';
+    let ticking = false;
+
+    function updateActiveLink() {
+      const scrollY = window.scrollY;
+      let current = headingElements[0]?.slug || '';
+
+      for (const { slug, el } of headingElements) {
+        // Offset by 100px so active state changes before heading reaches top
+        if (el.offsetTop - 100 <= scrollY) {
+          current = slug;
+        }
+      }
+
+      if (current !== activeSlug) {
+        activeSlug = current;
+        tocLinks.forEach((link) => {
+          const linkSlug = link.getAttribute('data-heading-slug');
+          if (linkSlug === activeSlug) {
+            link.classList.add('text-[var(--color-accent)]', 'border-[var(--color-accent)]', 'font-medium');
+            link.classList.remove('text-[var(--color-text-secondary)]', 'border-transparent');
+          } else {
+            link.classList.remove('text-[var(--color-accent)]', 'border-[var(--color-accent)]', 'font-medium');
+            link.classList.add('text-[var(--color-text-secondary)]', 'border-transparent');
+          }
+        });
+      }
+
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(updateActiveLink);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // Initialize on load
+    updateActiveLink();
+
+    // Smooth scroll for TOC links
+    tocLinks.forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const slug = link.getAttribute('data-heading-slug');
+        if (!slug) return;
+        const target = document.getElementById(slug);
+        if (target) {
+          const offset = 80; // account for fixed header
+          const top = target.offsetTop - offset;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      });
+    });
+  }
+
+  initTOC();
+  document.addEventListener('astro:after-swap', initTOC);
+</script>

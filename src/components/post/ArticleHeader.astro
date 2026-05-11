@@ -1,0 +1,27 @@
+---
+// ArticleHeader - displays post title, date, categories, and tags
+import PostMeta from './PostMeta.astro';
+
+interface Props {
+  title: string;
+  date: Date;
+  categories: string[] | string[][] | string;
+  tags: string[];
+  readingTime?: string;
+}
+
+const { title, date, categories, tags, readingTime } = Astro.props;
+---
+
+<header class="mb-10 pb-8 border-b border-[var(--color-border)] dark:border-[var(--color-border-dark)]">
+  <h1 class="text-3xl sm:text-4xl font-bold text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)] leading-tight mb-5">
+    {title}
+  </h1>
+
+  <PostMeta
+    date={date}
+    categories={categories}
+    tags={tags}
+    readingTime={readingTime}
+  />
+</header>
