@@ -30,8 +30,10 @@ Before modifying any execution-plane path, answer these in the work notes or cha
 3. Is `/spec` accepted?
 4. Is `/plan` accepted before `/build` starts?
 5. What paths are owned by this work?
-6. Does this touch execution-plane paths: `apps/**`, `packages/**`, `deploy/**`, `source/**`, `tools/**`, `async_spider.py`, or `async_pusher.py`?
+6. Does this touch execution-plane paths defined in `project/governance/repository_layout.md`?
 7. Are there unrelated dirty worktree changes that must be preserved?
+8. If a subagent is involved, is its allowed stage, owned paths, and expected evidence recorded in `agents.md` or the active stage file?
+9. If a runtime entrypoint is changed, does it still point back to the canonical governance skill or contract?
 
 ## Hard Stops
 
@@ -40,6 +42,8 @@ Before modifying any execution-plane path, answer these in the work notes or cha
 - If `/plan` is not accepted, do not build.
 - If the requested edit is outside owned paths, update the plan before editing.
 - If dirty user changes affect the same files, inspect and work with them; do not revert them.
+- If a subagent is not explicitly assigned by main-agent, it must not edit files or produce formal stage evidence.
+- If runtime entrypoints diverge from canonical governance skills, sync them before closing the work.
 
 ## Output
 

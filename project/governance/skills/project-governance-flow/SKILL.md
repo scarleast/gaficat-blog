@@ -57,6 +57,46 @@ The canonical project contracts always win over runtime copies and borrowed chec
 - Findings, tests, review decisions, and acceptance must be written to files, not only chat.
 - **NO CODE WITHOUT WI**: Before modifying any execution-plane file (`apps/**`, `packages/**`, `deploy/**`, `source/**`, `tools/**`, entry scripts), a WI must exist in `project/work/` with at least `/spec` completed. Research, measurement, and analysis are allowed without a WI, but the moment you decide to change code, stop and create the WI first.
 
+## Subagent Dispatch Rules
+
+Subagents consume only work assigned by main-agent. Record every subagent assignment in `project/work/<work-id>/agents.md` or the active stage file before the subagent edits files or produces stage evidence.
+
+Each assignment must state:
+
+- agent name or role
+- allowed stage
+- owned paths
+- expected output or evidence
+- shared-file or conflict constraints
+
+Subagents must not:
+
+- claim work items directly
+- advance `state.md`
+- close work items
+- edit paths outside assigned ownership
+- treat chat-only results as formal evidence
+
+When a subagent discovers new scope, blockers, defects, or path conflicts, main-agent decides whether to update `/spec`, `/plan`, `agents.md`, or create follow-up work.
+
+## Runtime Entrypoint Rules
+
+Canonical governance skills live under `project/governance/skills/**`. Runtime files under `.codex/skills/**`, `.claude/commands/**`, or other agent-specific directories are thin entrypoints or synced copies.
+
+Runtime entrypoints must:
+
+- point back to the canonical skill or contract
+- avoid defining new state machines, closing rules, or role permissions
+- be synced after canonical skill changes
+- keep private runtime config, caches, and local state out of the governance source of truth
+
+When canonical skills change:
+
+1. update `project/governance/skills/**`
+2. sync runtime copies or commands
+3. verify source-of-truth headers or canonical references
+4. record the sync result in the work item
+
 ## Work Item Files
 
 Use templates in `project/governance/templates/`.

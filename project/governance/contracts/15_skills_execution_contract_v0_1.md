@@ -49,6 +49,44 @@ Subagent 负责：
 - 不直接关闭 work item
 - 不直接改写未分配路径
 
+### 3.1 Subagent 分派规则
+
+Subagent 只能消费 `main-agent` 明确分配的工作。分配必须记录在 `project/work/<work-id>/agents.md` 或阶段文件中，并至少包含：
+
+- agent 名称或角色
+- 允许阶段
+- owned paths
+- 预期输出或 evidence
+- 共享文件冲突处理方式
+
+Subagent 禁止：
+
+- 自行 claim work item
+- 自行创建、跳转或关闭阶段
+- 直接修改 `state.md`、`work_index.md` 或 `/ship` 记录
+- 编辑未分配路径
+- 把聊天结论当作正式 evidence
+
+Subagent 如果发现新范围、阻塞、缺陷或路径冲突，必须回报 `main-agent`，由 `main-agent` 判断是否更新 `/spec`、`/plan`、`agents.md` 或创建后续 work item。
+
+### 3.2 Runtime Entry 规则
+
+`project/governance/skills/**` 是 canonical skill 源。`.codex/skills/**`、`.claude/commands/**` 或其他 agent runtime 文件只是入口或同步副本。
+
+Runtime entry 必须：
+
+- 指回 canonical skill 或 contract
+- 不定义新的状态机、关闭规则或角色权限
+- 在 canonical skill 变更后同步
+- 保持私有 runtime 配置、缓存和本地状态不进入正式治理事实源
+
+同步顺序：
+
+1. 更新 `project/governance/skills/**` 或 `project/governance/contracts/**`
+2. 同步 `.codex/skills/**`、`.claude/commands/**` 等 runtime entry
+3. 验证 source-of-truth header 或入口引用
+4. 在 work item 中记录同步结果
+
 ## 4. 阶段推进规则
 
 任何阶段推进都必须满足：

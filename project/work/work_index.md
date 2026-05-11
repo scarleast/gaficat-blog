@@ -14,3 +14,4 @@
 | --- | --- | --- | --- |
 | WI-0001 | 2026-05-11 | Introduce project governance | `project/work/WI-0001/` |
 | WI-0002 | 2026-05-11 | Add repository hygiene baseline | `project/work/WI-0002/` |
+| WI-0003 | 2026-05-11 | Sync subagent runtime governance | `project/work/WI-0003/` |
