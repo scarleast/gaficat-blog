@@ -12,6 +12,9 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0006 | 2026-05-12 | Fluid Visual Parity Review And Repair | `project/work/WI-0006/` |
+| WI-0005 | 2026-05-12 | Restore Fluid Post Scroll Layering | `project/work/WI-0005/` |
+| WI-0004 | 2026-05-12 | Visual Parity with Fluid Theme (superseded by WI-0006) | `project/work/WI-0004/` |
 | WI-0001 | 2026-05-11 | Introduce project governance | `project/work/WI-0001/` |
 | WI-0002 | 2026-05-11 | Add repository hygiene baseline | `project/work/WI-0002/` |
 | WI-0003 | 2026-05-11 | Sync subagent runtime governance | `project/work/WI-0003/` |

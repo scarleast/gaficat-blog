@@ -5,6 +5,7 @@ import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeImageCaptions from './src/utils/rehype-image-captions';
 
 export default defineConfig({
   site: 'https://www.gaficat.com',
@@ -15,11 +16,16 @@ export default defineConfig({
   trailingSlash: 'never',
   markdown: {
     shikiConfig: {
-      theme: 'github-light',
-      wrap: true,
+      theme: 'github-dark',
+      wrap: false,
+      langAlias: {
+        JSON: 'json',
+        ejs: 'html',
+        table: 'plaintext',
+      },
     },
     remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeKatex],
+    rehypePlugins: [rehypeKatex, rehypeImageCaptions],
   },
   vite: {
     plugins: [tailwindcss()],

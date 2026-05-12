@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
 
 const allPosts = await getCollection('posts');
 
@@ -15,20 +15,15 @@ allPosts.forEach((post) => {
 const tags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]);
 ---
 
-<BaseLayout title="标签" description="所有文章标签">
-  <main class="max-w-4xl mx-auto px-4 py-12">
-    <h1 class="text-3xl font-bold text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)] mb-8">标签</h1>
-
-    <div class="flex flex-wrap gap-3">
-      {tags.map(([tag, count]) => (
-        <a
-          href={`/tags/${tag}.html`}
-          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--color-bg-card)] dark:bg-[var(--color-bg-card-dark)] border border-[var(--color-border)] dark:border-[var(--color-border-dark)] hover:border-[var(--color-accent)] dark:hover:border-[var(--color-accent)] transition-colors text-[var(--color-text)] dark:text-[var(--color-text-dark)]"
-        >
-          <span>{tag}</span>
-          <span class="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">({count})</span>
-        </a>
-      ))}
-    </div>
-  </main>
-</BaseLayout>
+<PageLayout title="标签" description="所有文章标签">
+  <div class="tag-cloud">
+    {tags.map(([tag, count]) => (
+      <a
+        href={`/tags/${tag}.html`}
+        class="tag-cloud-tag"
+      >
+        {tag}<sup>{count}</sup>
+      </a>
+    ))}
+  </div>
+</PageLayout>

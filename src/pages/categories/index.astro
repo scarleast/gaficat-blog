@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
 
 const allPosts = await getCollection('posts');
 
@@ -25,20 +25,22 @@ allPosts.forEach((post) => {
 const categories = [...categoryMap.entries()].sort((a, b) => b[1] - a[1]);
 ---
 
-<BaseLayout title="分类" description="所有文章分类">
-  <main class="max-w-4xl mx-auto px-4 py-12">
-    <h1 class="text-3xl font-bold text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)] mb-8">分类</h1>
-
-    <div class="grid gap-4">
-      {categories.map(([cat, count]) => (
+<PageLayout title="分类" description="所有文章分类">
+  <div class="category-list">
+    {categories.map(([cat, count]) => (
+      <div class="category row nomargin-x">
         <a
+          class="category-item list-group-item category-item-action col-10 col-md-11"
+          title={cat}
           href={`/categories/${cat}.html`}
-          class="flex items-center justify-between p-4 rounded-lg bg-[var(--color-bg-card)] dark:bg-[var(--color-bg-card-dark)] border border-[var(--color-border)] dark:border-[var(--color-border-dark)] hover:border-[var(--color-accent)] dark:hover:border-[var(--color-accent)] transition-colors"
         >
-          <span class="text-[var(--color-text)] dark:text-[var(--color-text-dark)] font-medium">{cat}</span>
-          <span class="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">{count} 篇</span>
+          {cat}
+          <span class="list-group-count">{count} 篇</span>
         </a>
-      ))}
-    </div>
-  </main>
-</BaseLayout>
+        <a href={`/categories/${cat}.html`} class="category-count col-2 col-md-1">
+          <span>{count}</span>
+        </a>
+      </div>
+    ))}
+  </div>
+</PageLayout>

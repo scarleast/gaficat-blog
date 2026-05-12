@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>WI-0006 Font Parity Comparison</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 24px;
+        background: #f1f3f5;
+        color: #1f2933;
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      }
+
+      h1 {
+        margin: 0 0 20px;
+        font-size: 20px;
+      }
+
+      h2 {
+        margin: 18px 0 10px;
+        font-size: 16px;
+      }
+
+      .pair {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 28px;
+      }
+
+      .panel {
+        overflow: hidden;
+        border: 1px solid #d9dee5;
+        border-radius: 4px;
+        background: #fff;
+      }
+
+      .label {
+        padding: 8px 10px;
+        border-bottom: 1px solid #d9dee5;
+        background: #fff;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WI-0006 Font Parity Comparison</h1>
+
+    <h2>Home</h2>
+    <div class="pair">
+      <div class="panel">
+        <div class="label">Original</div>
+        <img src="original-font-reference-home.png" alt="Original home font reference" />
+      </div>
+      <div class="panel">
+        <div class="label">Astro</div>
+        <img src="astro-font-parity-home.png" alt="Astro home font parity" />
+      </div>
+    </div>
+
+    <h2>Post</h2>
+    <div class="pair">
+      <div class="panel">
+        <div class="label">Original</div>
+        <img src="original-font-reference-post.png" alt="Original post font reference" />
+      </div>
+      <div class="panel">
+        <div class="label">Astro</div>
+        <img src="astro-font-parity-post.png" alt="Astro post font parity" />
+      </div>
+    </div>
+  </body>
+</html>

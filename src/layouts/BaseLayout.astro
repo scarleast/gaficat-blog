@@ -30,30 +30,38 @@ const isHome = Astro.url.pathname === '/';
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="dark" data-default-color-scheme="dark" data-color-scheme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#1f3144" />
 
-    <!-- Prevent dark mode FOUC -->
     <script is:inline>
-      (function () {
-        const theme = localStorage.getItem('theme');
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
-        }
+      (() => {
+        const root = document.documentElement;
+        const valid = { dark: true, light: true };
+        const stored =
+          localStorage.getItem('Fluid_Color_Scheme') ||
+          localStorage.getItem('theme');
+        const fallback = root.dataset.defaultColorScheme || 'dark';
+        const scheme = valid[stored] ? stored : fallback;
+
+        root.dataset.colorScheme = scheme;
+        root.classList.toggle('dark', scheme === 'dark');
+        root.classList.toggle('light', scheme === 'light');
+        root.style.colorScheme = scheme;
       })();
     </script>
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- Fonts -->
+    <!-- Fonts: JetBrains Mono for code only -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
 
@@ -66,14 +74,19 @@ const isHome = Astro.url.pathname === '/';
       publishedTime={publishedTime}
     />
   </head>
-  <body class="min-h-screen flex flex-col">
+  <body>
     <Header />
-    <main class:list={['flex-1', isHome ? '' : 'pt-16']}>
+    <main>
       <slot />
     </main>
     <Footer />
     <ScrollTop />
     <SearchModal />
     <PlyrInit />
+    <noscript>
+      <div class="noscript-warning" style="background-color: #f55; color: #fff; font-family: sans-serif; font-size: 1rem; font-weight: bold; position: fixed; left: 0; bottom: 0; text-align: center; width: 100%; z-index: 99;">
+        博客在允许 JavaScript 运行的环境下浏览效果更佳
+      </div>
+    </noscript>
   </body>
 </html>

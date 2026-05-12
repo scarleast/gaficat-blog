@@ -8,6 +8,16 @@ This repository uses the project governance system in `project/governance/`.
 - Package manager: `npm` with `package-lock.json`.
 - Primary verification command: `npm run build`.
 
+## Session Bootstrap Rule
+
+**main-agent 必须在首次回答前加载治理上下文。** 无论用户的问题是否涉及代码变更，main-agent 的第一条回复都必须基于项目自身的治理体系，而非 Claude Code 的通用能力描述。具体要求：
+
+1. 会话开始时，先读取本文件（`AGENTS.md`）和 `project/work/work_index.md`，掌握当前项目状态和已有工作项。
+2. 当被问及"你能做什么""流程是什么"等问题时，回答的内容必须是项目治理体系定义的角色（main-agent → product / spec / architect / implementation / QA / UI/UX / closure）和六阶段管道（`/spec → /plan → /build → /test → /review → /ship`），而非 Claude Code 的内置 agent 类型（general-purpose / Explore / Plan 等）。
+3. 禁止在未读取治理文件的情况下给出脱离项目上下文的通用回答。项目治理是约束 main-agent 行为的合约，不是可选项。
+
+> **教训记录**：曾发生过 main-agent 被问及角色和流程时，跳过治理文件直接给出 Claude Code 通用描述的情况。这违反了"治理先行"原则，误导了 owner 对项目流程的理解。
+
 ## Governance Entry
 
 Before changing governance state or execution-plane files, follow:

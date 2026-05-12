@@ -25,15 +25,15 @@ function getHeadingLevel(depth: number): string {
 
 <nav
   id="toc"
-  class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-thin"
+  class="max-h-[75vh] overflow-y-auto"
   aria-label="目录"
 >
-  <h2 class="text-sm font-semibold text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)] mb-4 uppercase tracking-wider">
+  <h2 class="text-sm font-semibold text-[var(--color-text-heading)] mb-4 uppercase tracking-wider">
     目录
   </h2>
 
   {tocHeadings.length === 0 ? (
-    <p class="text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">无标题</p>
+    <p class="text-sm text-[var(--color-text-secondary)]">无标题</p>
   ) : (
     <ul class="space-y-1.5 text-sm">
       {tocHeadings.map((heading) => (
@@ -46,7 +46,7 @@ function getHeadingLevel(depth: number): string {
             href={`#${heading.slug}`}
             data-toc-link
             data-heading-slug={heading.slug}
-            class="block py-1 border-l-2 border-transparent pl-3 text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)] transition-colors leading-snug"
+            class="block py-1 border-l-2 border-transparent pl-3 text-[var(--color-text-secondary)] hover:text-[var(--color-text-link-hover)] hover:border-[var(--color-text-link-hover)] transition-colors leading-snug"
           >
             {heading.text}
           </a>
@@ -93,10 +93,10 @@ function getHeadingLevel(depth: number): string {
         tocLinks.forEach((link) => {
           const linkSlug = link.getAttribute('data-heading-slug');
           if (linkSlug === activeSlug) {
-            link.classList.add('text-[var(--color-accent)]', 'border-[var(--color-accent)]', 'font-medium');
+            link.classList.add('text-[var(--color-text-link-hover)]', 'border-[var(--color-text-link-hover)]', 'font-medium');
             link.classList.remove('text-[var(--color-text-secondary)]', 'border-transparent');
           } else {
-            link.classList.remove('text-[var(--color-accent)]', 'border-[var(--color-accent)]', 'font-medium');
+            link.classList.remove('text-[var(--color-text-link-hover)]', 'border-[var(--color-text-link-hover)]', 'font-medium');
             link.classList.add('text-[var(--color-text-secondary)]', 'border-transparent');
           }
         });

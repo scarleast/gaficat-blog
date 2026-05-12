@@ -1,6 +1,5 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import ArticleHeader from '../components/post/ArticleHeader.astro';
 import Copyright from '../components/post/Copyright.astro';
 import PostNav from '../components/post/PostNav.astro';
 import TableOfContents from '../components/post/TableOfContents.astro';
@@ -30,14 +29,31 @@ interface Props {
 const { post, headings, prevPost, nextPost } = Astro.props;
 const { title, date, categories, tags, abbrlink, math = false, excerpt } = post.data;
 
-// Estimate reading time from content (rough Chinese text: ~400 chars/min)
 const content = await Astro.slots.render('default');
 const plainText = content.replace(/<[^>]*>/g, '').replace(/\s+/g, '');
-const readingTime = Math.max(1, Math.ceil(plainText.length / 400));
+const wordCount = plainText.length;
+const readingTime = Math.max(1, Math.ceil(wordCount / 400));
 const readingTimeStr = `${readingTime} 分钟`;
+
+const formattedDate = date.toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
 
 const postUrl = `https://www.gaficat.com/posts/${abbrlink}.html`;
 const hasToc = headings && headings.filter((h) => h.depth >= 2 && h.depth <= 3).length > 0;
+
+function getCategories(cat: string[] | string[][] | string): string[] {
+  if (typeof cat === 'string') return [cat];
+  if (Array.isArray(cat) && cat.length > 0) {
+    if (Array.isArray(cat[0])) return (cat as string[][]).map((chain) => chain.join('/'));
+    return cat as string[];
+  }
+  return [];
+}
+
+const bottomCategories = getCategories(categories);
 ---
 
 <BaseLayout
@@ -48,45 +64,116 @@ const hasToc = headings && headings.filter((h) => h.depth >= 2 && h.depth <= 3).
   publishedTime={date.toISOString()}
 >
   <ReadingProgress />
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 lg:py-12">
-    <div class="flex gap-10">
-      <!-- Main article column -->
-      <article class="flex-1 min-w-0 max-w-none lg:max-w-[var(--spacing-content-max)]">
-        <div class="bg-[var(--color-bg-card)] dark:bg-[var(--color-bg-card-dark)] border border-[var(--color-border)] dark:border-[var(--color-border-dark)] px-6 sm:px-8 lg:px-10 py-8 sm:py-10">
-          <ArticleHeader
-            title={title}
-            date={date}
-            categories={categories}
-            tags={tags}
-            readingTime={readingTimeStr}
-          />
 
-          <!-- Article content -->
-          <div class="prose">
-            <slot />
+  <!-- Banner with post title and meta — matching halo-theme-fluid banner-post.html -->
+  <div class="header-inner" style="height: 70vh;">
+    <div id="banner" class="banner" style="background-image: url('https://pic.gaficat.com/halo/banner.png');" parallax="true">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3);">
+          <div class="banner-text text-center fade-in-up">
+            <div class="h2">
+              <span id="subtitle" data-typed-text={title}></span><span class="typed-cursor typed-cursor--blink" aria-hidden="true">_</span>
+            </div>
+            <div class="mt-3">
+              <span class="post-meta">
+                <svg class="post-meta-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 002 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg>
+                <time datetime={date.toISOString()} pubdate>{formattedDate}</time>
+              </span>
+            </div>
+            <div class="mt-1">
+              <span class="post-meta" style="margin-right: 0.5rem;">
+                <svg class="post-meta-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+                {wordCount} 字
+              </span>
+              <span class="post-meta" style="margin-right: 0.5rem;">
+                <svg class="post-meta-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                {readingTimeStr}
+              </span>
+            </div>
           </div>
-
-          <!-- Copyright notice -->
-          <Copyright />
-
-          <!-- Prev / Next navigation -->
-          <PostNav
-            prevPost={prevPost ? { title: prevPost.data.title, abbrlink: prevPost.data.abbrlink } : undefined}
-            nextPost={nextPost ? { title: nextPost.data.title, abbrlink: nextPost.data.abbrlink } : undefined}
-          />
         </div>
-      </article>
-
-      <!-- Sidebar - Table of Contents (hidden on mobile and when no headings) -->
-      {hasToc && (
-        <aside class="hidden lg:block w-[var(--spacing-sidebar)] shrink-0">
-          <TableOfContents headings={headings} />
-        </aside>
-      )}
+      </div>
     </div>
   </div>
 
-  <!-- Conditional MathJax loading for posts with math content -->
+  <!-- Post layout — matching halo-theme-fluid post.html structure -->
+  <main>
+    <div class="container-fluid nopadding-x">
+      <div class="row nomargin-x">
+        <!-- Left sidebar spacer (matches Fluid's side-col) -->
+        <div class="side-col d-none d-lg-block col-lg-2"></div>
+
+        <!-- Main content column -->
+        <div class="col-lg-8 nopadding-x-md">
+          <div class="container nopadding-x-md" id="board-ctn">
+            <div id="board">
+              <article class="post-content mx-auto">
+                <h1 id="seo-header">{title}</h1>
+
+                <!-- Article content -->
+                <div class="markdown-body">
+                  <slot />
+                </div>
+
+                <hr />
+
+                <div>
+                  {(bottomCategories.length > 0 || tags.length > 0) && (
+                    <div class="post-metas post-bottom-metas my-3">
+                      {bottomCategories.length > 0 && (
+                        <div class="post-meta mr-3 d-flex align-items-center">
+                          <svg class="post-meta-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor" d="M10 4l2 2h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2L2 6a2 2 0 012-2h6zm10 6H4v8h16v-8z" />
+                          </svg>
+                          <span class="category-chains">
+                            {bottomCategories.map((cat) => (
+                              <span class="category-chain">
+                                <a href={`/categories/${encodeURIComponent(cat)}.html`} class="category-chain-item print-no-link">{cat}</a>
+                              </span>
+                            ))}
+                          </span>
+                        </div>
+                      )}
+
+                      {tags.length > 0 && (
+                        <div class="post-meta d-flex align-items-center">
+                          <svg class="post-meta-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor" d="M20.6 13.2l-7.4 7.4a2 2 0 01-2.8 0l-7-7A2 2 0 012.8 12V4a2 2 0 012-2h8a2 2 0 011.4.6l6.4 6.4a3 3 0 010 4.2zM7.5 8A1.5 1.5 0 109 6.5 1.5 1.5 0 007.5 8z" />
+                          </svg>
+                          {tags.map((tag) => (
+                            <a href={`/tags/${encodeURIComponent(tag)}.html`} class="post-tag print-no-link">#{tag}</a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <!-- Copyright notice -->
+                  <Copyright title={title} date={date} />
+
+                  <!-- Prev / Next navigation -->
+                  <PostNav
+                    prevPost={prevPost ? { title: prevPost.data.title, abbrlink: prevPost.data.abbrlink } : undefined}
+                    nextPost={nextPost ? { title: nextPost.data.title, abbrlink: nextPost.data.abbrlink } : undefined}
+                  />
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right sidebar — Table of Contents -->
+        {hasToc && (
+          <div class="side-col d-none d-lg-block col-lg-2">
+            <div class="sidebar">
+              <TableOfContents headings={headings} />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </main>
+
   {math && (
     <script is:inline>
       window.MathJax = {
@@ -101,3 +188,58 @@ const hasToc = headings && headings.filter((h) => h.depth >= 2 && h.depth <= 3).
     </script>
   )}
 </BaseLayout>
+
+<script>
+  // Match Fluid's parallax: banner lags document scroll and side columns
+  // receive matching top padding so the TOC stays below the banner edge.
+  function initParallax() {
+    const banner = document.getElementById('banner');
+    if (!banner || banner.getAttribute('parallax') !== 'true') return;
+    const board = document.getElementById('board');
+    if (!board) return;
+    const sideCols = document.querySelectorAll<HTMLElement>('.side-col');
+
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const marginTop = parseInt(getComputedStyle(board).marginTop, 10) || 0;
+        const maxOffset = 96 + marginTop;
+        const offset = Math.min(window.scrollY / 5, maxOffset);
+        banner.style.transform = `translate3d(0, ${offset}px, 0)`;
+        sideCols.forEach((sideCol) => {
+          sideCol.style.paddingTop = `${offset}px`;
+        });
+        ticking = false;
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  initParallax();
+
+  // Typed.js-style typing effect for post title
+  function initTyped() {
+    const el = document.getElementById('subtitle');
+    if (!el) return;
+
+    const text = el.getAttribute('data-typed-text') || '';
+    el.textContent = '';
+    let charIndex = 0;
+
+    function type() {
+      if (charIndex < text.length) {
+        charIndex++;
+        el.textContent = text.substring(0, charIndex);
+        setTimeout(type, 100);
+      }
+    }
+
+    setTimeout(type, 500);
+  }
+
+  initTyped();
+</script>

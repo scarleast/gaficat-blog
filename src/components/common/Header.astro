@@ -1,152 +1,202 @@
 ---
-import ThemeToggle from './ThemeToggle.astro';
-
 const navLinks = [
   { href: '/', label: '首页' },
-  { href: '/archives', label: '归档' },
-  { href: '/categories', label: '分类' },
-  { href: '/tags', label: '标签' },
-  { href: '/aboutme', label: '关于' },
   { href: '/links', label: '友链' },
+  { href: '/about', label: '关于' },
 ];
 
 const currentPath = Astro.url.pathname;
-const isHome = currentPath === '/';
+const hasBanner = true; // All pages with banner use transparent header
 ---
 
-<header
+<!-- Navbar — matching halo-theme-fluid navigation.html structure -->
+<nav
   id="site-header"
   class:list={[
-    'fixed top-0 left-0 right-0 z-40 transition-all duration-300',
-    isHome
-      ? 'bg-transparent header-transparent'
-      : 'bg-[var(--color-bg-nav)] dark:bg-[var(--color-bg-nav-dark)] shadow-sm',
+    'navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar',
+    hasBanner
+      ? 'header-transparent'
+      : 'navbar-scrolled',
   ]}
 >
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
-    <div class="flex items-center justify-between h-16">
-      <!-- Site title -->
-      <a
-        href="/"
-        class="flex items-center gap-2 text-white font-semibold text-lg tracking-wide hover:opacity-90 transition-opacity shrink-0"
-      >
-        <span class="hidden sm:inline">加菲猫的创客工坊</span>
-        <span class="sm:hidden">加菲猫</span>
-      </a>
+  <div class="container" style="max-width: 1140px;">
+    <!-- Brand — matching Fluid: font-size 1rem on wrapper, 1.25rem on strong -->
+    <a class="navbar-brand" href="/" style="font-size: 1rem; color: var(--color-navbar-text);">
+      <strong style="font-size: 1.25rem; font-weight: 700;">加菲猫的创客工坊</strong>
+    </a>
 
-      <!-- Desktop nav -->
-      <nav class="hidden md:flex items-center gap-1">
+    <!-- Mobile toggle — matching Fluid animated-icon pattern -->
+    <button
+      id="navbar-toggler-btn"
+      class="navbar-toggler"
+      type="button"
+      aria-label="Toggle navigation"
+    >
+      <div class="animated-icon">
+        <span></span><span></span><span></span>
+      </div>
+    </button>
+
+    <!-- Desktop nav — matching Fluid: navbar-nav ml-auto -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
         {navLinks.map((link) => {
           const isActive = currentPath === link.href ||
             (link.href !== '/' && currentPath.startsWith(link.href.replace(/\/$/, '')));
           return (
-            <a
-              href={link.href}
-              class:list={[
-                'px-3 py-2 rounded-md text-sm font-medium transition-colors',
-                isActive
-                  ? 'text-white bg-white/15'
-                  : 'text-white/75 hover:text-white hover:bg-white/10',
-              ]}
-            >
-              {link.label}
-            </a>
+            <li class="nav-item">
+              <a
+                class:list={[
+                  'nav-link',
+                  isActive ? 'navbar-link-active' : '',
+                ]}
+                href={link.href}
+                style="color: var(--color-navbar-text); font-size: 0.875rem;"
+              >
+                {link.label}
+              </a>
+            </li>
           );
         })}
-      </nav>
-
-      <!-- Right side: search + theme toggle + mobile menu button -->
-      <div class="flex items-center gap-2">
         <!-- Search button -->
-        <button
-          id="search-btn"
-          type="button"
-          aria-label="搜索"
-          class="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-        >
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
-
-        <ThemeToggle />
-
-        <!-- Mobile hamburger -->
-        <button
-          id="mobile-menu-btn"
-          type="button"
-          aria-label="打开菜单"
-          class="md:hidden p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-        >
-          <!-- Hamburger icon -->
-          <svg id="hamburger-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-          <!-- Close icon -->
-          <svg id="close-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
+        <li class="nav-item" id="search-btn">
+          <a class="nav-link" target="_self" href="javascript:;" style="color: var(--color-navbar-text); cursor: pointer;" aria-label="Search">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display: inline;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </a>
+        </li>
+        <!-- Color toggle — matching Fluid color-toggle-btn placement -->
+        <li class="nav-item" id="color-toggle-btn">
+          <a
+            class="nav-link"
+            target="_self"
+            href="javascript:;"
+            aria-label="Color Toggle"
+            title="Color Toggle"
+            style="color: var(--color-navbar-text); cursor: pointer;"
+          >
+            <span id="color-toggle-icon" aria-hidden="true" data-next="light">
+              <svg id="color-toggle-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A8.5 8.5 0 1111.2 3a6.7 6.7 0 009.8 9.8z"></path>
+              </svg>
+              <svg id="color-toggle-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+              </svg>
+            </span>
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
+</nav>
 
-  <!-- Mobile menu dropdown -->
-  <div
-    id="mobile-menu"
-    class="md:hidden hidden bg-[var(--color-bg-nav)] dark:bg-[var(--color-bg-nav-dark)] border-t border-white/10"
-  >
-    <nav class="px-4 py-3 space-y-1">
-      {navLinks.map((link) => {
-        const isActive = currentPath === link.href ||
-          (link.href !== '/' && currentPath.startsWith(link.href.replace(/\/$/, '')));
-        return (
-          <a
-            href={link.href}
-            class:list={[
-              'block px-3 py-2.5 rounded-md text-sm font-medium transition-colors',
-              isActive
-                ? 'text-white bg-white/15'
-                : 'text-white/75 hover:text-white hover:bg-white/10',
-            ]}
-          >
-            {link.label}
-          </a>
-        );
-      })}
-    </nav>
-  </div>
-</header>
+<style>
+  /* Animated hamburger icon — matching halo-theme-fluid */
+  .animated-icon {
+    width: 30px;
+    height: 20px;
+    position: relative;
+    margin: 0;
+    transform: rotate(0deg);
+    transition: 0.5s ease-in-out;
+    cursor: pointer;
+  }
+
+  .animated-icon span {
+    display: block;
+    position: absolute;
+    height: 3px;
+    width: 100%;
+    border-radius: 9px;
+    opacity: 1;
+    left: 0;
+    transform: rotate(0deg);
+    transition: 0.25s ease-in-out;
+    background: #fff;
+  }
+
+  .animated-icon span:nth-child(1) { top: 0; }
+  .animated-icon span:nth-child(2) { top: 10px; }
+  .animated-icon span:nth-child(3) { top: 20px; }
+
+  .animated-icon.open span:nth-child(1) {
+    top: 11px;
+    transform: rotate(135deg);
+  }
+
+  .animated-icon.open span:nth-child(2) {
+    opacity: 0;
+    left: -60px;
+  }
+
+  .animated-icon.open span:nth-child(3) {
+    top: 11px;
+    transform: rotate(-135deg);
+  }
+
+  /* Navbar toggler overrides */
+  .navbar-toggler {
+    border-width: 0;
+    outline: 0;
+    background: none;
+  }
+
+  /* Mobile menu open state */
+  .collapse.navbar-collapse.show {
+    display: block !important;
+  }
+
+  /* Mobile dropdown styling */
+  @media (max-width: 991.98px) {
+    .collapse.navbar-collapse.show {
+      background: rgba(31, 49, 68, 0.7);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      padding: 1rem 0;
+      border-radius: 0.25rem;
+      margin-top: 0.5rem;
+    }
+
+    html[data-color-scheme="light"] .collapse.navbar-collapse.show {
+      background: rgba(47, 65, 84, 0.7);
+    }
+
+    .collapse.navbar-collapse.show .nav-link {
+      text-align: center;
+      padding: 0.5rem 1rem;
+    }
+  }
+</style>
 
 <script>
   function initMobileMenu() {
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const hamburgerIcon = document.getElementById('hamburger-icon');
-    const closeIcon = document.getElementById('close-icon');
+    const menuBtn = document.getElementById('navbar-toggler-btn');
+    const collapse = document.getElementById('navbarSupportedContent');
+    const animatedIcon = menuBtn?.querySelector('.animated-icon');
 
-    if (!menuBtn || !mobileMenu || !hamburgerIcon || !closeIcon) return;
+    if (!menuBtn || !collapse || !animatedIcon) return;
+    if (menuBtn.dataset.fluidBound === 'true') return;
+    menuBtn.dataset.fluidBound = 'true';
 
     let isOpen = false;
 
     function toggleMenu() {
       isOpen = !isOpen;
-      mobileMenu.classList.toggle('hidden', !isOpen);
-      hamburgerIcon.classList.toggle('hidden', isOpen);
-      closeIcon.classList.toggle('hidden', !isOpen);
-      menuBtn.setAttribute('aria-label', isOpen ? '关闭菜单' : '打开菜单');
+      collapse.classList.toggle('show', isOpen);
+      animatedIcon.classList.toggle('open', isOpen);
+      menuBtn.setAttribute('aria-label', isOpen ? '关闭菜单' : 'Toggle navigation');
     }
 
     menuBtn.addEventListener('click', toggleMenu);
 
-    // Close menu when clicking a link
-    mobileMenu.querySelectorAll('a').forEach((link) => {
+    collapse.querySelectorAll('a').forEach((link) => {
       link.addEventListener('click', () => {
         if (isOpen) toggleMenu();
       });
     });
 
-    // Close menu on escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && isOpen) toggleMenu();
     });
@@ -155,41 +205,76 @@ const isHome = currentPath === '/';
   function initSearchButton() {
     const searchBtn = document.getElementById('search-btn');
     if (!searchBtn) return;
-    searchBtn.addEventListener('click', () => {
-      const modal = document.getElementById('search-modal');
-      if (modal) {
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        const input = document.getElementById('search-input') as HTMLInputElement;
-        if (input) setTimeout(() => input.focus(), 100);
-      }
-    });
+    searchBtn.onclick = () => {
+      document.dispatchEvent(new CustomEvent('fluid:open-search'));
+    };
   }
+
+  function applyColorScheme(scheme) {
+    const root = document.documentElement;
+    const nextScheme = scheme === 'light' ? 'light' : 'dark';
+    const nextToggle = nextScheme === 'dark' ? 'light' : 'dark';
+    const icon = document.getElementById('color-toggle-icon');
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+
+    root.dataset.colorScheme = nextScheme;
+    root.classList.toggle('dark', nextScheme === 'dark');
+    root.classList.toggle('light', nextScheme === 'light');
+    root.style.colorScheme = nextScheme;
+    icon?.setAttribute('data-next', nextToggle);
+    metaThemeColor?.setAttribute('content', nextScheme === 'dark' ? '#1f3144' : '#2f4154');
+  }
+
+  function initColorToggle() {
+    const colorToggle = document.getElementById('color-toggle-btn');
+    const root = document.documentElement;
+    if (!colorToggle) return;
+
+    applyColorScheme(root.dataset.colorScheme === 'light' ? 'light' : 'dark');
+    colorToggle.onclick = (event) => {
+      event.preventDefault();
+      const current = root.dataset.colorScheme === 'light' ? 'light' : 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('Fluid_Color_Scheme', next);
+      localStorage.setItem('theme', next);
+      applyColorScheme(next);
+    };
+  }
+
+  let activeHeaderScrollHandler: (() => void) | undefined;
 
   function initHeaderScroll() {
     const header = document.getElementById('site-header');
     if (!header || !header.classList.contains('header-transparent')) return;
+    if (activeHeaderScrollHandler) {
+      window.removeEventListener('scroll', activeHeaderScrollHandler);
+    }
 
     function onScroll() {
-      if (window.scrollY > 60) {
-        header.classList.add('bg-[var(--color-bg-nav)]', 'shadow-sm');
-        header.classList.remove('bg-transparent');
+      const banner = document.querySelector('.banner');
+      const threshold = banner ? banner.offsetHeight * 0.6 : 60;
+      if (window.scrollY > threshold) {
+        header.classList.add('navbar-scrolled');
+        header.classList.add('top-nav-collapse');
       } else {
-        header.classList.remove('bg-[var(--color-bg-nav)]', 'shadow-sm');
-        header.classList.add('bg-transparent');
+        header.classList.remove('navbar-scrolled');
+        header.classList.remove('top-nav-collapse');
       }
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+    activeHeaderScrollHandler = onScroll;
+    window.addEventListener('scroll', activeHeaderScrollHandler, { passive: true });
     onScroll();
   }
 
   initMobileMenu();
   initSearchButton();
+  initColorToggle();
   initHeaderScroll();
   document.addEventListener('astro:after-swap', () => {
     initMobileMenu();
     initSearchButton();
+    initColorToggle();
     initHeaderScroll();
   });
 </script>

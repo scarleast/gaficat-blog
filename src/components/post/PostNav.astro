@@ -15,51 +15,24 @@ const { prevPost, nextPost } = Astro.props;
 ---
 
 {(prevPost || nextPost) && (
-  <nav class="mt-10 pt-8 border-t border-[var(--color-border)] dark:border-[var(--color-border-dark)]" aria-label="文章导航">
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <!-- Previous post -->
-      <div class:list={['min-w-0', nextPost && !prevPost && 'sm:col-start-2']}>
-        {prevPost ? (
-          <a
-            href={`/posts/${prevPost.abbrlink}.html`}
-            class="group flex flex-col p-4 rounded-lg border border-[var(--color-border)] dark:border-[var(--color-border-dark)] bg-[var(--color-bg-card)] dark:bg-[var(--color-bg-card-dark)] hover:border-[var(--color-accent)] dark:hover:border-[var(--color-accent)] transition-colors"
-          >
-            <span class="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] mb-1.5 flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-              上一篇
-            </span>
-            <span class="text-sm font-medium text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)] group-hover:text-[var(--color-accent)] transition-colors line-clamp-2">
-              {prevPost.title}
-            </span>
-          </a>
-        ) : (
-          <div />
-        )}
-      </div>
-
-      <!-- Next post -->
-      <div class="min-w-0">
-        {nextPost ? (
-          <a
-            href={`/posts/${nextPost.abbrlink}.html`}
-            class="group flex flex-col items-end text-right p-4 rounded-lg border border-[var(--color-border)] dark:border-[var(--color-border-dark)] bg-[var(--color-bg-card)] dark:bg-[var(--color-bg-card-dark)] hover:border-[var(--color-accent)] dark:hover:border-[var(--color-accent)] transition-colors"
-          >
-            <span class="text-xs text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] mb-1.5 flex items-center gap-1">
-              下一篇
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </span>
-            <span class="text-sm font-medium text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)] group-hover:text-[var(--color-accent)] transition-colors line-clamp-2">
-              {nextPost.title}
-            </span>
-          </a>
-        ) : (
-          <div />
-        )}
-      </div>
-    </div>
-  </nav>
+  <div class="post-prevnext my-3" aria-label="文章导航">
+    <article class="post-prev col-6">
+      {prevPost && (
+        <a href={`/posts/${prevPost.abbrlink}.html`} title={prevPost.title}>
+          <i class="iconfont icon-arrowleft"></i>
+          <span class="hidden-mobile">{prevPost.title}</span>
+          <span class="visible-mobile">上一篇</span>
+        </a>
+      )}
+    </article>
+    <article class="post-next col-6">
+      {nextPost && (
+        <a href={`/posts/${nextPost.abbrlink}.html`} title={nextPost.title}>
+          <span class="hidden-mobile">{nextPost.title}</span>
+          <span class="visible-mobile">下一篇</span>
+          <i class="iconfont icon-arrowright"></i>
+        </a>
+      )}
+    </article>
+  </div>
 )}

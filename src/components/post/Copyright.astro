@@ -1,38 +1,73 @@
 ---
-// Copyright notice - shown at bottom of posts with CC BY-NC-ND 4.0 license
+// Copyright notice - Fluid-style license box shown at bottom of posts
 const siteUrl = 'https://www.gaficat.com';
 const postUrl = `${siteUrl}${Astro.url.pathname}`;
+
+interface Props {
+  title?: string;
+  author?: string;
+  date?: Date;
+}
+
+const { title = '', author = 'scarleast', date } = Astro.props;
+const formattedDate = date
+  ? `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月${String(date.getDate()).padStart(2, '0')}日`
+  : undefined;
 ---
 
-<div class="mt-10 p-5 rounded-lg bg-[var(--color-bg)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border)] dark:border-[var(--color-border-dark)] text-sm leading-relaxed">
-  <div class="flex items-start gap-3">
-    <!-- CC icon -->
-    <svg class="w-6 h-6 shrink-0 mt-0.5 text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-7h2v2h-2zm0-6h2v4h-2z" />
-    </svg>
+<div class="license-box my-3">
+  <div class="license-title">
+    <div>{title}</div>
+    <div>{postUrl}</div>
+  </div>
+  <div class="license-meta">
+    <div class="license-meta-item">
+      <div>作者</div>
+      <div>{author}</div>
+    </div>
 
-    <div class="space-y-1.5">
-      <p class="font-medium text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)]">
-        版权声明
-      </p>
-      <p class="text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">
-        本文作者：<span class="font-medium text-[var(--color-text)] dark:text-[var(--color-text-dark)]">scarleast</span>
-      </p>
-      <p class="text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">
-        本文链接：<a href={postUrl} class="break-all hover:text-[var(--color-accent)] transition-colors">{postUrl}</a>
-      </p>
-      <p class="text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">
-        本作品采用
+    {formattedDate && (
+      <div class="license-meta-item license-meta-date">
+        <div>发布于</div>
+        <div>{formattedDate}</div>
+      </div>
+    )}
+
+    <div class="license-meta-item">
+      <div>许可协议</div>
+      <div>
         <a
-          href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh"
+          class="print-no-link"
           target="_blank"
-          rel="noopener noreferrer"
-          class="font-medium hover:text-[var(--color-accent)] transition-colors"
+          href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh"
+          rel="external nofollow noreferrer"
+          aria-label="BY - 署名"
+          data-tooltip="署名"
         >
-          知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议
+          <span class="license-badge" aria-hidden="true">BY</span>
         </a>
-        进行许可。
-      </p>
+        <a
+          class="print-no-link"
+          target="_blank"
+          href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh"
+          rel="external nofollow noreferrer"
+          aria-label="NC - 非商业性使用"
+          data-tooltip="非商业性使用"
+        >
+          <span class="license-badge" aria-hidden="true">NC</span>
+        </a>
+        <a
+          class="print-no-link"
+          target="_blank"
+          href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh"
+          rel="external nofollow noreferrer"
+          aria-label="ND - 禁止演绎"
+          data-tooltip="禁止演绎"
+        >
+          <span class="license-badge" aria-hidden="true">ND</span>
+        </a>
+      </div>
     </div>
   </div>
+  <div class="license-icon iconfont"></div>
 </div>

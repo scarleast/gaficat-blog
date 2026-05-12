@@ -1,33 +1,34 @@
 ---
-// SearchModal - Pagefind-based local search with modal UI
+// SearchModal - Pagefind search with local fuzzy fallback
 ---
 
-<div id="search-modal" class="fixed inset-0 z-[100] hidden">
+<div id="search-modal" class="fixed inset-0 z-[100] hidden search-modal">
   <!-- Backdrop -->
-  <div id="search-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm"></div>
+  <div id="search-backdrop" class="fixed inset-0 search-backdrop"></div>
 
   <!-- Modal -->
-  <div class="fixed inset-0 flex items-start justify-center pt-[10vh] px-4">
-    <div class="relative w-full max-w-2xl bg-[var(--color-bg-card)] dark:bg-[var(--color-bg-card-dark)] rounded-xl shadow-2xl border border-[var(--color-border)] dark:border-[var(--color-border-dark)] overflow-hidden">
-      <!-- Search input -->
-      <div class="flex items-center px-4 border-b border-[var(--color-border)] dark:border-[var(--color-border-dark)]">
-        <svg class="w-5 h-5 text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <input
-          id="search-input"
-          type="text"
-          placeholder="搜索文章..."
-          class="w-full px-3 py-4 bg-transparent text-[var(--color-text)] dark:text-[var(--color-text-dark)] placeholder-[var(--color-text-secondary)] dark:placeholder-[var(--color-text-secondary-dark)] outline-none text-base"
-          autocomplete="off"
-        />
-        <kbd class="hidden sm:inline-flex items-center px-2 py-1 text-xs font-mono text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] bg-[var(--color-bg)] dark:bg-[var(--color-bg-dark)] rounded border border-[var(--color-border)] dark:border-[var(--color-border-dark)]">ESC</kbd>
+  <div class="search-dialog">
+    <div class="search-content">
+      <div class="search-header">
+        <h4 class="search-title">搜索</h4>
+        <button id="search-close" class="search-close" type="button" aria-label="关闭">×</button>
       </div>
+      <!-- Search input -->
+      <div class="search-body">
+        <div class="search-field">
+          <label for="search-input">关键词</label>
+          <input
+            id="search-input"
+            type="text"
+            class="search-input"
+            placeholder=" "
+            autocomplete="off"
+          />
+        </div>
 
-      <!-- Results -->
-      <div id="search-results" class="max-h-[60vh] overflow-y-auto p-2">
-        <div class="text-center py-8 text-sm text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">
-          输入关键词开始搜索
+        <!-- Results -->
+        <div id="search-results" class="search-results">
+          <div class="search-empty">输入关键词开始搜索</div>
         </div>
       </div>
     </div>
@@ -35,44 +36,164 @@
 </div>
 
 <style>
-  .search-result {
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: background-color 0.15s;
+  .search-modal {
+    color: var(--color-text-primary);
+    overflow-x: hidden;
+    overflow-y: auto;
   }
-  .search-result:hover {
-    background-color: rgba(0, 0, 0, 0.04);
+  .search-backdrop {
+    background: rgba(0, 0, 0, 0.6);
   }
-  .dark .search-result:hover {
-    background-color: rgba(255, 255, 255, 0.06);
+  .search-dialog {
+    position: relative;
+    width: auto;
+    max-width: 800px;
+    margin: 28px auto;
+    pointer-events: none;
   }
-  .search-result-title {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--color-text-heading);
-    margin-bottom: 0.25rem;
-  }
-  .dark .search-result-title {
-    color: var(--color-text-heading-dark);
-  }
-  .search-result-excerpt {
-    font-size: 0.85rem;
-    color: var(--color-text-secondary);
-    line-height: 1.5;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-  .dark .search-result-excerpt {
-    color: var(--color-text-secondary-dark);
-  }
-  .search-result mark {
-    background-color: rgba(48, 169, 222, 0.25);
-    color: inherit;
-    padding: 0 2px;
+  .search-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: calc(100vh - 56px);
+    pointer-events: auto;
+    background: var(--color-board-bg);
+    border: 0;
     border-radius: 2px;
+    box-shadow:
+      0 5px 11px 0 rgba(0, 0, 0, 0.18),
+      0 4px 15px 0 rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+  }
+  .search-header {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px;
+    border-bottom: 1px solid var(--color-line);
+    border-radius: 2px 2px 0 0;
+  }
+  .search-title {
+    width: 100%;
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 36px;
+    text-align: center;
+  }
+  .search-close {
+    margin: -16px -16px -16px 0;
+    padding: 16px;
+    color: var(--color-text-primary);
+    background: transparent;
+    border: 0;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 24px;
+    opacity: 0.5;
+    cursor: pointer;
+  }
+  .search-close:hover {
+    opacity: 0.75;
+  }
+  .search-body {
+    position: relative;
+    flex: 1 1 auto;
+    margin: 0 16px;
+    padding: 16px;
+    overflow-y: auto;
+  }
+  .search-field {
+    position: relative;
+    margin-bottom: 40px;
+  }
+  .search-field label {
+    display: block;
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 12.8px;
+    font-weight: 400;
+    line-height: 19.2px;
+  }
+  .search-input {
+    display: block;
+    width: 100%;
+    height: 40.992px;
+    margin: 0 0 8px;
+    padding: 9.6px 0 6.4px;
+    color: var(--color-text-primary);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: var(--color-line) 0 1px 0 0;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    outline: 0;
+  }
+  .search-input:focus {
+    box-shadow: var(--color-text-link-hover) 0 1px 0 0;
+  }
+  .search-field:focus-within label,
+  .search-field.has-value label {
+    color: var(--color-text-link-hover);
+  }
+  .search-results {
+    margin: 0;
+    padding: 0;
+    border-radius: 4px;
+    color: var(--color-text-primary);
+    font-size: 16px;
+    line-height: 24px;
+  }
+  :global(.search-result-title) {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 12px 20px;
+    color: var(--color-text-primary);
+    background: transparent;
+    border: 0;
+    border-left: 3px solid #0d47a1;
+    border-radius: 4px 4px 0 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    text-decoration: none;
+  }
+  :global(.search-result-title:hover) {
+    color: var(--color-text-link-hover);
+    text-decoration: none;
+  }
+  :global(.search-result-excerpt) {
+    margin: 0 0 16px;
+    padding: 0 20px;
+    color: var(--color-text-primary);
+    background: transparent;
+    border: 0;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+  }
+  :global(.search-word) {
+    color: #ff4500;
+  }
+  .search-empty {
+    padding: 0 20px;
+    color: var(--color-text-secondary);
+  }
+  @media (max-width: 991.98px) {
+    .search-dialog {
+      max-width: 500px;
+      margin: 28px auto;
+    }
+  }
+  @media (max-width: 575.98px) {
+    .search-dialog {
+      max-width: none;
+      margin: 8px;
+    }
   }
 </style>
 
@@ -80,20 +201,229 @@
   function initSearch() {
     var modal = document.getElementById('search-modal');
     var backdrop = document.getElementById('search-backdrop');
+    var closeBtn = document.getElementById('search-close');
     var input = document.getElementById('search-input');
     var results = document.getElementById('search-results');
     if (!modal || !backdrop || !input || !results) return;
 
     var pagefind = null;
+    var pagefindLoaded = false;
+    var localIndex = null;
+    var localIndexPromise = null;
+
+    function syncInputState() {
+      if (input.value.trim()) {
+        input.parentElement && input.parentElement.classList.add('has-value');
+      } else {
+        input.parentElement && input.parentElement.classList.remove('has-value');
+      }
+    }
 
     async function loadPagefind() {
-      if (pagefind) return;
+      if (pagefindLoaded) return pagefind;
       try {
         pagefind = await import('/pagefind/pagefind.js');
         await pagefind.init();
       } catch (e) {
         // Pagefind not available (dev mode or not yet generated)
       }
+      pagefindLoaded = true;
+      return pagefind;
+    }
+
+    async function loadLocalIndex() {
+      if (localIndex) return localIndex;
+      if (!localIndexPromise) {
+        localIndexPromise = fetch('/search-index.json')
+          .then(function(response) {
+            if (!response.ok) throw new Error('Search index unavailable');
+            return response.json();
+          })
+          .then(function(data) {
+            localIndex = Array.isArray(data) ? data : [];
+            return localIndex;
+          })
+          .catch(function() {
+            localIndex = [];
+            return localIndex;
+          });
+      }
+      return localIndexPromise;
+    }
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/[&<>"']/g, function(char) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[char];
+      });
+    }
+
+    function escapeRegExp(value) {
+      return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function highlightText(value, query) {
+      var html = escapeHtml(value);
+      var terms = tokenize(query).filter(function(term) { return term.length > 0; });
+      terms.forEach(function(term) {
+        html = html.replace(new RegExp(escapeRegExp(term), 'gi'), '<span class="search-word">$&</span>');
+      });
+      return html;
+    }
+
+    function normalize(value) {
+      return String(value || '')
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[\s\p{P}\p{S}_]+/gu, '');
+    }
+
+    function tokenize(value) {
+      return String(value || '')
+        .toLowerCase()
+        .split(/[\s\p{P}\p{S}_]+/u)
+        .map(normalize)
+        .filter(Boolean);
+    }
+
+    function isSubsequence(needle, haystack) {
+      if (!needle) return true;
+      if (!haystack || needle.length > haystack.length) return false;
+      var index = 0;
+      for (var i = 0; i < haystack.length && index < needle.length; i++) {
+        if (haystack[i] === needle[index]) index++;
+      }
+      return index === needle.length;
+    }
+
+    function fuzzyRatio(needle, haystack) {
+      if (!needle || !haystack) return 0;
+      if (haystack.includes(needle)) return 1;
+      if (!/^[a-z0-9]+$/.test(needle) || needle.length < 3) return 0;
+      return isSubsequence(needle, haystack) ? needle.length / haystack.length : 0;
+    }
+
+    function fuzzyTokenMatch(term, text) {
+      if (!/^[a-z0-9]+$/.test(term) || term.length < 3) return 0;
+      var words = tokenize(text);
+      var best = 0;
+      for (var i = 0; i < words.length; i++) {
+        var ratio = fuzzyRatio(term, words[i]);
+        if (ratio > best) best = ratio;
+        if (best >= 0.85) break;
+      }
+      return best;
+    }
+
+    function scoreLocalResult(item, query) {
+      var normalizedQuery = normalize(query);
+      if (!normalizedQuery) return 0;
+
+      var title = normalize(item.title);
+      var taxonomies = normalize([].concat(item.tags || [], item.categories || []).join(' '));
+      var excerpt = normalize(item.excerpt);
+      var text = normalize(item.text);
+      var terms = tokenize(query);
+      var score = 0;
+
+      if (title === normalizedQuery) score += 120;
+      if (title.includes(normalizedQuery)) score += 80;
+      if (taxonomies.includes(normalizedQuery)) score += 55;
+      if (excerpt.includes(normalizedQuery)) score += 35;
+      if (text.includes(normalizedQuery)) score += 25;
+
+      if (terms.length > 1 && terms.every(function(term) { return text.includes(term); })) {
+        score += 30;
+      }
+
+      var titleRatio = fuzzyRatio(normalizedQuery, title);
+      if (titleRatio > 0) score += 45 * titleRatio;
+
+      var taxonomyRatio = fuzzyRatio(normalizedQuery, taxonomies);
+      if (taxonomyRatio > 0) score += 30 * taxonomyRatio;
+
+      if (score === 0 && terms.length > 0) {
+        var matchedTerms = terms.filter(function(term) {
+          return text.includes(term) || fuzzyRatio(term, title) >= 0.45 || fuzzyTokenMatch(term, item.text) >= 0.65;
+        }).length;
+        score += matchedTerms * 10;
+      }
+
+      terms.forEach(function(term) {
+        var bodyRatio = fuzzyTokenMatch(term, item.text);
+        if (bodyRatio >= 0.65) score += 18 * bodyRatio;
+      });
+
+      return score;
+    }
+
+    function searchLocalIndex(index, query) {
+      return index
+        .map(function(item) {
+          return {
+            url: item.url,
+            title: item.title || '无标题',
+            excerpt: item.excerpt || '',
+            score: scoreLocalResult(item, query)
+          };
+        })
+        .filter(function(item) { return item.score > 0; })
+        .sort(function(a, b) { return b.score - a.score; })
+        .slice(0, 10);
+    }
+
+    async function searchPagefind(query) {
+      var engine = await loadPagefind();
+      if (!engine) return [];
+      try {
+        var search = await engine.search(query);
+        var data = await Promise.all(
+          search.results.slice(0, 10).map(function(r) { return r.data(); })
+        );
+        return data.map(function(r, index) {
+          return {
+            url: r.url,
+            title: r.meta && r.meta.title || '无标题',
+            excerpt: r.excerpt || '',
+            score: 1000 - index
+          };
+        });
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function mergeResults(primary, fallback) {
+      var seen = {};
+      return primary.concat(fallback).filter(function(item) {
+        if (!item.url || seen[item.url]) return false;
+        seen[item.url] = true;
+        return true;
+      }).slice(0, 10);
+    }
+
+    function renderResults(items, query) {
+      if (items.length === 0) {
+        results.innerHTML = '<div class="search-empty">没有找到相关结果</div>';
+        return;
+      }
+
+      results.innerHTML = items.map(function(r) {
+        return '<a href="' + escapeHtml(r.url) + '" class="search-result-title">' +
+          highlightText(r.title, query) +
+          '</a>' +
+          '<p class="search-result-excerpt">' + highlightText(r.excerpt, query) + '</p>';
+      }).join('');
+
+      results.querySelectorAll('a').forEach(function(a) {
+        a.addEventListener('click', closeModal);
+      });
     }
 
     function openModal() {
@@ -101,13 +431,17 @@
       document.body.style.overflow = 'hidden';
       setTimeout(function() { input.focus(); }, 100);
       loadPagefind();
+      loadLocalIndex();
     }
+
+    document.addEventListener('fluid:open-search', openModal);
 
     function closeModal() {
       modal.classList.add('hidden');
       document.body.style.overflow = '';
       input.value = '';
-      results.innerHTML = '<div class="text-center py-8 text-sm" style="color: var(--color-text-secondary)">输入关键词开始搜索</div>';
+      syncInputState();
+      results.innerHTML = '<div class="search-empty">输入关键词开始搜索</div>';
     }
 
     document.addEventListener('keydown', function(e) {
@@ -125,37 +459,24 @@
     });
 
     backdrop.addEventListener('click', closeModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
 
     var debounceTimer;
     input.addEventListener('input', function() {
+      syncInputState();
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(async function() {
         var query = input.value.trim();
-        if (!query || !pagefind) {
-          results.innerHTML = '<div class="text-center py-8 text-sm" style="color: var(--color-text-secondary)">输入关键词开始搜索</div>';
+        if (!query) {
+          results.innerHTML = '<div class="search-empty">输入关键词开始搜索</div>';
           return;
         }
 
-        var search = await pagefind.search(query);
-        var resultsData = await Promise.all(
-          search.results.slice(0, 10).map(function(r) { return r.data(); })
-        );
-
-        if (resultsData.length === 0) {
-          results.innerHTML = '<div class="text-center py-8 text-sm" style="color: var(--color-text-secondary)">没有找到相关结果</div>';
-          return;
-        }
-
-        results.innerHTML = resultsData.map(function(r) {
-          return '<a href="' + r.url + '" class="search-result block">' +
-            '<div class="search-result-title">' + (r.meta && r.meta.title || '无标题') + '</div>' +
-            '<div class="search-result-excerpt">' + (r.excerpt || '') + '</div>' +
-          '</a>';
-        }).join('');
-
-        results.querySelectorAll('a').forEach(function(a) {
-          a.addEventListener('click', closeModal);
-        });
+        results.innerHTML = '<div class="search-empty">搜索中...</div>';
+        var pagefindResults = await searchPagefind(query);
+        var index = await loadLocalIndex();
+        var localResults = searchLocalIndex(index, query);
+        renderResults(mergeResults(pagefindResults, localResults), query);
       }, 200);
     });
   }

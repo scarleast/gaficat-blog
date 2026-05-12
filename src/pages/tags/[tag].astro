@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageLayout from '../../layouts/PageLayout.astro';
 import PostCard from '../../components/home/PostCard.astro';
 
 export async function getStaticPaths() {
@@ -23,22 +23,12 @@ export async function getStaticPaths() {
 const { tag, posts } = Astro.props;
 ---
 
-<BaseLayout title={`标签：${tag}`} description={`标签 "${tag}" 下的所有文章`}>
-  <main class="max-w-4xl mx-auto px-4 py-12">
-    <div class="mb-8">
-      <a href="/tags.html" class="text-sm text-[var(--color-accent)] hover:underline mb-2 inline-block">← 所有标签</a>
-      <h1 class="text-3xl font-bold text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)]">
-        标签：{tag}
-      </h1>
-      <p class="text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)] mt-2">
-        共 {posts.length} 篇文章
-      </p>
-    </div>
+<PageLayout title={`标签：${tag}`} description={`标签 "${tag}" 下的所有文章`}>
+  <div style="margin-bottom: 1rem;">
+    <a href="/tags.html" style="font-size: 0.85rem; color: var(--color-text-link-hover);">← 所有标签</a>
+  </div>
 
-    <div class="grid gap-6">
-      {posts.map((post) => (
-        <PostCard post={post} />
-      ))}
-    </div>
-  </main>
-</BaseLayout>
+  {posts.map((post) => (
+    <PostCard post={post} />
+  ))}
+</PageLayout>

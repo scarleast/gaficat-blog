@@ -10,15 +10,54 @@ const { title, description } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
-  <div class="max-w-[var(--spacing-content-max)] mx-auto px-4 sm:px-6 py-8 lg:py-12">
-    <div class="bg-[var(--color-bg-card)] dark:bg-[var(--color-bg-card-dark)] rounded-xl shadow-sm border border-[var(--color-border)] dark:border-[var(--color-border-dark)] px-6 sm:px-8 lg:px-10 py-8 sm:py-10">
-      <h1 class="text-3xl sm:text-4xl font-bold text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)] leading-tight mb-8 pb-6 border-b border-[var(--color-border)] dark:border-[var(--color-border-dark)]">
-        {title}
-      </h1>
-
-      <div class="prose">
-        <slot />
+  <!-- Banner with page title — matching halo-theme-fluid banner.html -->
+  <div class="header-inner" style="height: 60vh;">
+    <div id="banner" class="banner" style="background-image: url('https://pic.gaficat.com/halo/banner.png');" parallax="true">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3);">
+          <div class="banner-text text-center fade-in-up">
+            <div class="h2">
+              <span id="subtitle">{title}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Page content — matching halo-theme-fluid board structure -->
+  <main>
+    <div class="container nopadding-x-md">
+      <div id="board">
+        <div class="container">
+          <div class="row">
+            <div class="col-12 col-md-10 m-auto">
+              <slot />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 </BaseLayout>
+
+<script>
+  function initParallax() {
+    const banner = document.getElementById('banner');
+    if (!banner || banner.getAttribute('parallax') !== 'true') return;
+    const board = document.getElementById('board');
+    if (!board) return;
+
+    function onScroll() {
+      const marginTop = parseInt(getComputedStyle(board).marginTop, 10) || 0;
+      const maxOffset = 96 + marginTop;
+      const offset = Math.min(window.scrollY / 5, maxOffset);
+      banner.style.transform = `translate3d(0, ${offset}px, 0)`;
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  initParallax();
+</script>

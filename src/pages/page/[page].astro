@@ -30,50 +30,126 @@ export async function getStaticPaths() {
 }
 
 const { posts, currentPage, totalPages } = Astro.props;
+
+// Generate page numbers for pagination
+function getPageNumbers(current: number, total: number): (number | '...')[] {
+  const pages: (number | '...')[] = [];
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (current > 3) pages.push('...');
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+      pages.push(i);
+    }
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
+  }
+  return pages;
+}
+
+const pageNumbers = getPageNumbers(currentPage, totalPages);
 ---
 
 <BaseLayout title={`第 ${currentPage} 页 - 加菲猫的创客工坊`} description="分享各种电子设计DIY、物联网DIY、读书笔记、生活想法、流行钢琴、工作踩坑">
-  <main class="max-w-4xl mx-auto px-4 py-12">
-    <h1 class="text-2xl font-bold text-[var(--color-text-heading)] dark:text-[var(--color-text-heading-dark)] mb-8">
-      文章列表
-    </h1>
-
-    <div class="grid gap-6">
-      {posts.map((post: any) => (
-        <PostCard post={post} />
-      ))}
+  <!-- Banner — matching halo-theme-fluid banner.html -->
+  <div class="header-inner" style="height: 100vh;">
+    <div id="banner" class="banner" style="background-image: url('https://pic.gaficat.com/halo/banner.png');" parallax="true">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3);">
+          <div class="banner-text text-center fade-in-up">
+            <div class="h2" style="font-size: 32px; font-weight: 500; color: #fff; line-height: 1.2;">
+              <span>踏上取经路比取得真经更重要。</span>
+            </div>
+          </div>
+          <div class="scroll-down-bar">
+            <i class="iconfont icon-arrowdown">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14M19 12l-7 7-7-7"/>
+              </svg>
+            </i>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Pagination -->
-    <nav class="flex justify-center items-center gap-4 mt-12">
-      {currentPage > 2 ? (
-        <a
-          href={`/page/${currentPage - 1}.html`}
-          class="px-4 py-2 rounded-lg border border-[var(--color-border)] dark:border-[var(--color-border-dark)] text-[var(--color-text)] dark:text-[var(--color-text-dark)] hover:border-[var(--color-accent)] transition-colors"
-        >
-          ← 上一页
-        </a>
-      ) : (
-        <a
-          href="/"
-          class="px-4 py-2 rounded-lg border border-[var(--color-border)] dark:border-[var(--color-border-dark)] text-[var(--color-text)] dark:text-[var(--color-text-dark)] hover:border-[var(--color-accent)] transition-colors"
-        >
-          ← 上一页
-        </a>
-      )}
+  <!-- Post List — matching halo-theme-fluid index.html structure -->
+  <main>
+    <div class="container nopadding-x-md">
+      <div id="board">
+        <div class="container">
+          <div class="row">
+            <div class="col-12 col-md-10 m-auto">
+              {posts.map((post: any) => (
+                <PostCard post={post} />
+              ))}
 
-      <span class="text-[var(--color-text-secondary)] dark:text-[var(--color-text-secondary-dark)]">
-        第 {currentPage} 页 / 共 {totalPages} 页
-      </span>
-
-      {currentPage < totalPages && (
-        <a
-          href={`/page/${currentPage + 1}.html`}
-          class="px-4 py-2 rounded-lg bg-[var(--color-primary)] dark:bg-[var(--color-primary-light)] text-white hover:opacity-90 transition-opacity"
-        >
-          下一页 →
-        </a>
-      )}
-    </nav>
+              <!-- Pagination — matching halo-theme-fluid paginator -->
+              {totalPages > 1 && (
+                <nav class="pagination" aria-label="文章分页">
+                  {currentPage > 1 && (
+                    <a
+                      class="extend prev"
+                      rel="prev"
+                      href={currentPage === 2 ? '/' : `/page/${currentPage - 1}.html`}
+                    >‹</a>
+                  )}
+                  {pageNumbers.map((page) => (
+                    page === '...' ? (
+                      <span class="space">…</span>
+                    ) : page === currentPage ? (
+                      <span class="current">{page}</span>
+                    ) : (
+                      <a class="page-number" href={page === 1 ? '/' : `/page/${page}.html`}>{page}</a>
+                    )
+                  ))}
+                  {currentPage < totalPages && (
+                    <a class="extend next" rel="next" href={`/page/${currentPage + 1}.html`}>›</a>
+                  )}
+                </nav>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 </BaseLayout>
+
+<script>
+  // Banner parallax
+  function initParallax() {
+    const banner = document.getElementById('banner');
+    if (!banner || banner.getAttribute('parallax') !== 'true') return;
+    const board = document.getElementById('board');
+    if (!board) return;
+
+    function onScroll() {
+      const marginTop = parseInt(getComputedStyle(board).marginTop, 10) || 0;
+      const maxOffset = 96 + marginTop;
+      const offset = Math.min(window.scrollY / 5, maxOffset);
+      banner.style.transform = `translate3d(0, ${offset}px, 0)`;
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  initParallax();
+
+  // Scroll down arrow click
+  function initScrollDownArrow() {
+    const scrollDownBar = document.querySelector('.scroll-down-bar');
+    if (scrollDownBar) {
+      scrollDownBar.addEventListener('click', () => {
+        const banner = document.getElementById('banner');
+        if (banner) {
+          window.scrollTo({ top: banner.offsetHeight, behavior: 'smooth' });
+        }
+      });
+    }
+  }
+
+  initScrollDownArrow();
+</script>
