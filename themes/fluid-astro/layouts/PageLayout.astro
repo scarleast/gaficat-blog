@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import { fluidBannerStyle, fluidMaskStyle, fluidThemeConfig } from '../config.mjs';
 
 interface Props {
   title: string;
@@ -11,10 +12,10 @@ const { title, description } = Astro.props;
 
 <BaseLayout title={title} description={description}>
   <!-- Banner with page title — matching halo-theme-fluid banner.html -->
-  <div class="header-inner" style="height: 60vh;">
-    <div id="banner" class="banner" style="background-image: url('https://pic.gaficat.com/halo/banner.png');" parallax="true">
+  <div class="header-inner" style={`height: ${fluidThemeConfig.banner.page_height};`}>
+    <div id="banner" class="banner" style={fluidBannerStyle()} parallax={String(fluidThemeConfig.banner.parallax)}>
       <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3);">
+        <div class="mask flex-center" style={fluidMaskStyle()}>
           <div class="banner-text text-center fade-in-up">
             <div class="h2">
               <span id="subtitle">{title}</span>

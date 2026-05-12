@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0021 | 2026-05-12 | Introduce Hexo-Style Content And Fluid Astro Theme Boundary | `project/work/WI-0021/` |
 | WI-0020 | 2026-05-12 | Close Stale WI Delivery Metadata | `project/work/WI-0020/` |
 | WI-0019 | 2026-05-12 | Restore Post Prev Next Arrows | `project/work/WI-0019/` |
 | WI-0018 | 2026-05-12 | Align Paginated Home Board With Homepage | `project/work/WI-0018/` |

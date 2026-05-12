@@ -1,9 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import PostCard from '../components/home/PostCard.astro';
+import BaseLayout from '../../themes/fluid-astro/layouts/BaseLayout.astro';
+import PostCard from '../../themes/fluid-astro/components/home/PostCard.astro';
+import { fluidBannerStyle, fluidMaskStyle, fluidThemeConfig } from '../../themes/fluid-astro/config.mjs';
 
-const POSTS_PER_PAGE = 10;
+const POSTS_PER_PAGE = fluidThemeConfig.index.per_page;
 
 const allPosts = (await getCollection('posts'))
   .sort((a, b) => {
@@ -37,15 +38,15 @@ function getPageNumbers(current: number, total: number): (number | '...')[] {
 const pageNumbers = getPageNumbers(currentPage, totalPages);
 ---
 
-<BaseLayout title="加菲猫的创客工坊" description="分享各种电子设计DIY、物联网DIY、读书笔记、生活想法、流行钢琴、工作踩坑">
+<BaseLayout title={fluidThemeConfig.site.title} description={fluidThemeConfig.site.description}>
   <!-- Banner — matching halo-theme-fluid banner.html -->
-  <div class="header-inner" style="height: 100vh;">
-    <div id="banner" class="banner" style="background-image: url('https://pic.gaficat.com/halo/banner.png');" parallax="true">
+  <div class="header-inner" style={`height: ${fluidThemeConfig.banner.index_height};`}>
+    <div id="banner" class="banner" style={fluidBannerStyle()} parallax={String(fluidThemeConfig.banner.parallax)}>
       <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3);">
+        <div class="mask flex-center" style={fluidMaskStyle()}>
           <div class="banner-text text-center fade-in-up">
             <div class="h2" style="font-size: 32px; font-weight: 500; color: #fff; line-height: 1.2;">
-              <span id="subtitle" data-typed-fallback="踏上取经路比取得真经更重要。"></span>
+              <span id="subtitle" data-typed-fallback={fluidThemeConfig.index.slogan.text}></span>
             </div>
           </div>
           <div class="scroll-down-bar" id="scroll-down-bar">

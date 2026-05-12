@@ -4,6 +4,7 @@ import Copyright from '../components/post/Copyright.astro';
 import PostNav from '../components/post/PostNav.astro';
 import TableOfContents from '../components/post/TableOfContents.astro';
 import ReadingProgress from '../components/common/ReadingProgress.astro';
+import { fluidBannerStyle, fluidMaskStyle, fluidThemeConfig } from '../config.mjs';
 
 interface PostLink {
   data: { title: string; abbrlink: string };
@@ -41,7 +42,7 @@ const formattedDate = date.toLocaleDateString('zh-CN', {
   day: '2-digit',
 });
 
-const postUrl = `https://www.gaficat.com/posts/${abbrlink}.html`;
+const postUrl = `${fluidThemeConfig.site.url}/posts/${abbrlink}.html`;
 const hasToc = headings && headings.filter((h) => h.depth >= 2 && h.depth <= 3).length > 0;
 
 function getCategories(cat: string[] | string[][] | string): string[] {
@@ -66,10 +67,10 @@ const bottomCategories = getCategories(categories);
   <ReadingProgress />
 
   <!-- Banner with post title and meta — matching halo-theme-fluid banner-post.html -->
-  <div class="header-inner" style="height: 70vh;">
-    <div id="banner" class="banner" style="background-image: url('https://pic.gaficat.com/halo/banner.png');" parallax="true">
+  <div class="header-inner" style={`height: ${fluidThemeConfig.banner.post_height};`}>
+    <div id="banner" class="banner" style={fluidBannerStyle()} parallax={String(fluidThemeConfig.banner.parallax)}>
       <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3);">
+        <div class="mask flex-center" style={fluidMaskStyle()}>
           <div class="banner-text text-center fade-in-up">
             <div class="h2">
               <span id="subtitle" data-typed-text={title}></span><span class="typed-cursor typed-cursor--blink" aria-hidden="true">_</span>

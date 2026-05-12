@@ -1,0 +1,51 @@
+---
+// Footer — matching halo-theme-fluid footer.html structure
+import { fluidThemeConfig } from '../../config.mjs';
+
+const { footer } = fluidThemeConfig;
+---
+
+<footer>
+  <div class="footer-inner">
+    <!-- Credit row -->
+    {footer.powered.enable && (
+    <div class="footer-credit">
+      <a href={footer.powered.generator.url} target="_blank" rel="noopener noreferrer">{footer.powered.generator.name}</a>
+      &nbsp;·&nbsp;
+      <a href={footer.powered.theme.url} target="_blank" rel="noopener noreferrer">{footer.powered.theme.name}</a>
+    </div>
+    )}
+
+    <!-- Hosting row -->
+    {footer.upyun.enable && (
+    <div class="footer-hosting">
+      <span>{footer.upyun.text_prefix}</span>
+      <a
+        href={footer.upyun.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="又拍云提供对象存储服务"
+      >
+        <img
+          class="upyun-logo"
+          src={footer.upyun.logo}
+          alt=""
+          aria-hidden="true"
+        />
+      </a>
+      <span>{footer.upyun.text_suffix}</span>
+    </div>
+    )}
+
+    <!-- Beian row -->
+    <div class="beian">
+      <a href={footer.beian.icp.url} target="_blank" rel="nofollow noopener">
+        {footer.beian.icp.text}
+      </a>
+      <a class="beian-police-link" href={footer.beian.police.url} target="_blank" rel="nofollow noopener">
+        <img class="beian-police-icon" src={footer.beian.police.icon} alt="" width="16" height="16" loading="lazy" />
+        {footer.beian.police.text}
+      </a>
+    </div>
+  </div>
+</footer>

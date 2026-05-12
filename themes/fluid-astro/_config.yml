@@ -1,0 +1,85 @@
+# Fluid Astro theme config.
+#
+# The shape intentionally follows the upstream Hexo Fluid theme `_config.yml`
+# groups so site-specific values can move between Hexo-style Fluid themes and
+# this Astro renderer with minimal translation.
+
+site:
+  title: 加菲猫的创客工坊
+  subtitle: 踏上取经路比取得真经更重要。
+  description: 分享各种电子设计DIY、物联网DIY、读书笔记、生活想法、流行钢琴、工作踩坑
+  url: https://www.gaficat.com
+  language: zh-CN
+
+navbar:
+  blog_title: 加菲猫的创客工坊
+  menu:
+    - key: home
+      name: 首页
+      path: /
+    - key: links
+      name: 友链
+      path: /links
+    - key: about
+      name: 关于
+      path: /about
+  search: true
+  color_toggle: true
+
+banner:
+  image: https://pic.gaficat.com/halo/banner.png
+  mask_alpha: 0.3
+  parallax: true
+  index_height: 100vh
+  post_height: 70vh
+  page_height: 60vh
+
+index:
+  slogan:
+    text: 踏上取经路比取得真经更重要。
+    random: true
+    hitokoto: true
+    jinrishici: true
+  post_url: /posts/:abbrlink.html
+  per_page: 10
+
+post:
+  toc: true
+  word_count: true
+  read_time: true
+  copyright:
+    enable: true
+  prev_next: true
+
+footer:
+  powered:
+    enable: true
+    generator:
+      name: Astro
+      url: https://astro.build/
+    theme:
+      name: Fluid
+      url: https://github.com/chengzhongxue/halo-theme-fluid
+  upyun:
+    enable: true
+    text_prefix: 本站由
+    text_suffix: 提供对象存储服务
+    url: https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral
+    logo: /img/upyun_logo8.svg
+  beian:
+    icp:
+      text: 陕ICP备18017214号-1
+      url: https://beian.miit.gov.cn/
+    police:
+      text: 陕公网安备61019002003129号
+      url: http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=61019002003129
+      icon: /img/police_beian.png
+
+dark_mode:
+  enable: true
+  default: dark
+
+color:
+  theme_color:
+    dark: "#1f3144"
+    light: "#2f4154"

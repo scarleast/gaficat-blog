@@ -7,6 +7,7 @@ import PlyrInit from '../components/media/PlyrInit.astro';
 import OpenGraph from '../components/seo/OpenGraph.astro';
 import '../assets/styles/global.css';
 import '../assets/styles/typography.css';
+import { fluidThemeConfig } from '../config.mjs';
 
 interface Props {
   title?: string;
@@ -18,8 +19,8 @@ interface Props {
 }
 
 const {
-  title = '加菲猫的创客工坊',
-  description,
+  title = fluidThemeConfig.site.title,
+  description = fluidThemeConfig.site.description,
   type = 'website',
   image,
   url,
@@ -27,15 +28,17 @@ const {
 } = Astro.props;
 
 const isHome = Astro.url.pathname === '/';
+const defaultColorScheme = fluidThemeConfig.dark_mode.default;
+const themeColor = fluidThemeConfig.color.theme_color[defaultColorScheme] || fluidThemeConfig.color.theme_color.dark;
 ---
 
 <!doctype html>
-<html lang="zh-CN" class="dark" data-default-color-scheme="dark" data-color-scheme="dark">
+<html lang={fluidThemeConfig.site.language} class={defaultColorScheme} data-default-color-scheme={defaultColorScheme} data-color-scheme={defaultColorScheme}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#1f3144" />
+    <meta name="theme-color" content={themeColor} />
 
     <script is:inline>
       (() => {

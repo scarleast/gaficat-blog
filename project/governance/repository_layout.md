@@ -11,9 +11,11 @@ Astro static blog and content site.
 Files that change the shipped site, content, assets, scripts, or build behavior:
 
 - `src/pages/**`: routes and page templates.
-- `src/components/**`: reusable Astro components.
-- `src/layouts/**`: page and post layouts.
-- `src/assets/**`: source styles and local assets.
+- `themes/**`: reusable theme layouts, components, styles, and theme configuration.
+- `source/**`: Hexo-style authored content source, including `source/_posts/**`.
+- `src/components/**`: reusable Astro components that are not owned by a theme.
+- `src/layouts/**`: page and post layouts that are not owned by a theme.
+- `src/assets/**`: source styles and local assets that are not owned by a theme.
 - `src/utils/**`: site utilities.
 - `src/content/**`: blog posts and content collections.
 - `public/**`: static files copied to the final site.

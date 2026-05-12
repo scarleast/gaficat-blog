@@ -41,6 +41,8 @@ Use work item files under `project/work/WI-XXXX/` to record scope, plan, changed
 Execution-plane paths are the product files:
 
 - `src/**`
+- `source/**`
+- `themes/**`
 - `public/**`
 - `scripts/**`
 - `astro.config.mjs`

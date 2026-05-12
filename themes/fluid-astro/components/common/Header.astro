@@ -1,12 +1,15 @@
 ---
-const navLinks = [
-  { href: '/', label: '首页' },
-  { href: '/links', label: '友链' },
-  { href: '/about', label: '关于' },
-];
+import { fluidThemeConfig } from '../../config.mjs';
+
+const navLinks = fluidThemeConfig.navbar.menu.map((item: { path: string; name: string }) => ({
+  href: item.path,
+  label: item.name,
+}));
 
 const currentPath = Astro.url.pathname;
 const hasBanner = true; // All pages with banner use transparent header
+const darkThemeColor = fluidThemeConfig.color.theme_color.dark;
+const lightThemeColor = fluidThemeConfig.color.theme_color.light;
 ---
 
 <!-- Navbar — matching halo-theme-fluid navigation.html structure -->
@@ -22,7 +25,7 @@ const hasBanner = true; // All pages with banner use transparent header
   <div class="container" style="max-width: 1140px;">
     <!-- Brand — matching Fluid: font-size 1rem on wrapper, 1.25rem on strong -->
     <a class="navbar-brand" href="/" style="font-size: 1rem; color: var(--color-navbar-text);">
-      <strong style="font-size: 1.25rem; font-weight: 700;">加菲猫的创客工坊</strong>
+      <strong style="font-size: 1.25rem; font-weight: 700;">{fluidThemeConfig.navbar.blog_title}</strong>
     </a>
 
     <!-- Mobile toggle — matching Fluid animated-icon pattern -->
@@ -58,35 +61,38 @@ const hasBanner = true; // All pages with banner use transparent header
             </li>
           );
         })}
-        <!-- Search button -->
-        <li class="nav-item" id="search-btn">
-          <a class="nav-link" target="_self" href="javascript:;" style="color: var(--color-navbar-text); cursor: pointer;" aria-label="Search">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display: inline;">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </a>
-        </li>
+        {fluidThemeConfig.navbar.search && (
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" style="color: var(--color-navbar-text); cursor: pointer;" aria-label="Search">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display: inline;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </a>
+          </li>
+        )}
         <!-- Color toggle — matching Fluid color-toggle-btn placement -->
-        <li class="nav-item" id="color-toggle-btn">
-          <a
-            class="nav-link"
-            target="_self"
-            href="javascript:;"
-            aria-label="Color Toggle"
-            title="Color Toggle"
-            style="color: var(--color-navbar-text); cursor: pointer;"
-          >
-            <span id="color-toggle-icon" aria-hidden="true" data-next="light">
-              <svg id="color-toggle-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A8.5 8.5 0 1111.2 3a6.7 6.7 0 009.8 9.8z"></path>
-              </svg>
-              <svg id="color-toggle-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="4"></circle>
-                <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-              </svg>
-            </span>
-          </a>
-        </li>
+        {fluidThemeConfig.navbar.color_toggle && (
+          <li class="nav-item" id="color-toggle-btn">
+            <a
+              class="nav-link"
+              target="_self"
+              href="javascript:;"
+              aria-label="Color Toggle"
+              title="Color Toggle"
+              style="color: var(--color-navbar-text); cursor: pointer;"
+            >
+              <span id="color-toggle-icon" aria-hidden="true" data-next="light">
+                <svg id="color-toggle-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A8.5 8.5 0 1111.2 3a6.7 6.7 0 009.8 9.8z"></path>
+                </svg>
+                <svg id="color-toggle-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="4"></circle>
+                  <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+                </svg>
+              </span>
+            </a>
+          </li>
+        )}
       </ul>
     </div>
   </div>
@@ -170,7 +176,7 @@ const hasBanner = true; // All pages with banner use transparent header
   }
 </style>
 
-<script>
+<script define:vars={{ darkThemeColor, lightThemeColor }}>
   function initMobileMenu() {
     const menuBtn = document.getElementById('navbar-toggler-btn');
     const collapse = document.getElementById('navbarSupportedContent');
@@ -222,7 +228,7 @@ const hasBanner = true; // All pages with banner use transparent header
     root.classList.toggle('light', nextScheme === 'light');
     root.style.colorScheme = nextScheme;
     icon?.setAttribute('data-next', nextToggle);
-    metaThemeColor?.setAttribute('content', nextScheme === 'dark' ? '#1f3144' : '#2f4154');
+    metaThemeColor?.setAttribute('content', nextScheme === 'dark' ? darkThemeColor : lightThemeColor);
   }
 
   function initColorToggle() {
