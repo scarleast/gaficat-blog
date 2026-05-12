@@ -22,7 +22,7 @@
 ## Delivery
 
 - branch: main
-- commit: pending
+- commit: d988f6c
 - deploy: not deployed
 - push: blocked; no configured git remote / push destination
 

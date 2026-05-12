@@ -1,6 +1,6 @@
 # /ship
 
-- work_id: WI-0008
+- work_id: WI-0020
 - stage: ship
 - status: completed
 - owner: main-agent
@@ -9,7 +9,7 @@
 
 ## Summary
 
-- Shipped random homepage banner subtitle loading from Hitokoto or Jinrishici with fallback to the previous static slogan.
+- Closed stale delivery metadata for WI-0007 and WI-0008 and recorded this governance cleanup.
 
 ## Evidence
 
@@ -22,10 +22,10 @@
 ## Delivery
 
 - branch: main
-- commit: f3bcf12
+- commit: included in this ship commit
 - deploy: not deployed
 - push: failed; no configured push destination / no git remote is configured
 
 ## Follow-ups
 
-- none
+- Configure a git remote before remote push can complete.
