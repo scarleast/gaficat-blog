@@ -98,30 +98,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
 
 <style>
   #subtitle {
-    display: inline-block;
-    width: fit-content;
-    max-width: min(82vw, 760px);
     text-align: center;
-  }
-
-  :global(#subtitle .subtitle-author) {
-    display: block;
-    margin-top: 0.25rem;
-    text-align: right;
-    font-size: 0.75em;
-    line-height: 1.35;
-  }
-
-  :global(#subtitle .subtitle-author-track) {
-    display: inline-block;
-    text-align: left;
-    vertical-align: top;
-    white-space: nowrap;
-  }
-
-  :global(#subtitle .subtitle-author-typed) {
-    display: inline-block;
-    text-align: left;
   }
 </style>
 
@@ -153,7 +130,6 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
 
     const fallback = el.getAttribute('data-typed-fallback') || '踏上取经路比取得真经更重要。';
     const text = await resolveRandomSubtitle(fallback);
-    const authorTrackWidth = measureAuthorTrackWidth(text);
     let charIndex = 0;
 
     function escapeHtml(value) {
@@ -165,47 +141,10 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
         .replace(/'/g, '&#39;');
     }
 
-    function getAttribution(value) {
-      const newlineIndex = value.indexOf('\n');
-      return newlineIndex === -1 ? '' : value.slice(newlineIndex + 1);
-    }
-
-    function measureAuthorTrackWidth(value) {
-      const attribution = getAttribution(value);
-      if (!attribution) return 0;
-
-      const author = document.createElement('span');
-      author.className = 'subtitle-author';
-      author.style.position = 'absolute';
-      author.style.visibility = 'hidden';
-      author.style.pointerEvents = 'none';
-      author.style.whiteSpace = 'nowrap';
-      author.style.left = '-9999px';
-      author.textContent = attribution;
-      el.appendChild(author);
-      const width = Math.ceil(author.getBoundingClientRect().width);
-      author.remove();
-      return width;
-    }
-
     function renderSubtitle(value) {
       const escaped = escapeHtml(value);
       const cursor = '<span class="typed-cursor typed-cursor--blink" aria-hidden="true">_</span>';
-      const newlineIndex = escaped.indexOf('\n');
-      if (newlineIndex === -1) return `${escaped}${cursor}`;
-
-      const sentence = escaped.slice(0, newlineIndex);
-      const attribution = escaped.slice(newlineIndex + 1).replace(/\n/g, '<br>');
-      const trackWidth = authorTrackWidth > 0 ? ` style="width: ${authorTrackWidth}px;"` : '';
-
-      return [
-        sentence,
-        '<span class="subtitle-author">',
-        `<span class="subtitle-author-track"${trackWidth}>`,
-        `<span class="subtitle-author-typed">${attribution}${cursor}</span>`,
-        '</span>',
-        '</span>',
-      ].join('');
+      return `${escaped}${cursor}`;
     }
 
     function type() {
@@ -250,18 +189,16 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     return fallback;
   }
 
-  function formatSubtitle(sentence, author) {
+  function formatSubtitle(sentence) {
     const cleanSentence = typeof sentence === 'string' ? sentence.trim() : '';
-    const cleanAuthor = typeof author === 'string' ? author.trim() : '';
-    if (!cleanSentence) return '';
-    return cleanAuthor ? `${cleanSentence}\n——${cleanAuthor}` : cleanSentence;
+    return cleanSentence;
   }
 
   async function fetchHitokotoSubtitle() {
     const response = await fetch('https://v1.hitokoto.cn');
     if (!response.ok) throw new Error(`hitokoto request failed: ${response.status}`);
     const data = await response.json();
-    return formatSubtitle(data.hitokoto, data.from_who || data.from);
+    return formatSubtitle(data.hitokoto);
   }
 
   function loadJinrishiciSdk() {
@@ -295,8 +232,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
 
       jinrishici.load((result) => {
         const sentence = result?.data?.content;
-        const author = result?.data?.origin?.author;
-        resolve(formatSubtitle(sentence, author));
+        resolve(formatSubtitle(sentence));
       });
     });
   }
