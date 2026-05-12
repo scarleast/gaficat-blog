@@ -1177,29 +1177,6 @@ html[data-color-scheme="light"] .license-box {
   vertical-align: middle;
 }
 
-.footer-inner .footer-hosting .upyun-logo-light {
-  display: none !important;
-}
-
-html[data-color-scheme="light"] .footer-inner .footer-hosting .upyun-logo-dark {
-  display: none !important;
-}
-
-html[data-color-scheme="light"] .footer-inner .footer-hosting .upyun-logo-light {
-  display: inline-block !important;
-  height: 20px;
-  width: auto;
-  filter: none;
-}
-
-html[data-color-scheme="dark"] .footer-inner .footer-hosting .upyun-logo-dark {
-  display: inline-block !important;
-}
-
-html[data-color-scheme="dark"] .footer-inner .footer-hosting .upyun-logo-light {
-  display: none !important;
-}
-
 .footer-inner .statistics {
   display: flex;
   flex-direction: row;
