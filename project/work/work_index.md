@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0018 | 2026-05-12 | Align Paginated Home Board With Homepage | `project/work/WI-0018/` |
 | WI-0017 | 2026-05-12 | Remove Home Subtitle Author Display | `project/work/WI-0017/` |
 | WI-0016 | 2026-05-12 | Stabilize Subtitle Attribution Typing | `project/work/WI-0016/` |
 | WI-0015 | 2026-05-12 | Left-To-Right Subtitle Attribution Typing | `project/work/WI-0015/` |
