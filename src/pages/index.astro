@@ -186,7 +186,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     const response = await fetch('https://v1.hitokoto.cn');
     if (!response.ok) throw new Error(`hitokoto request failed: ${response.status}`);
     const data = await response.json();
-    return formatSubtitle(data.hitokoto, data.from_who);
+    return formatSubtitle(data.hitokoto, data.from_who || data.from);
   }
 
   function loadJinrishiciSdk() {

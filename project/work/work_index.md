@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0010 | 2026-05-12 | Make Home Subtitle Attribution Visible | `project/work/WI-0010/` |
 | WI-0009 | 2026-05-12 | Preserve Random Subtitle Author | `project/work/WI-0009/` |
 | WI-0008 | 2026-05-12 | Randomize Home Banner Subtitle | `project/work/WI-0008/` |
 | WI-0007 | 2026-05-12 | Fix Upyun Footer Logo Source | `project/work/WI-0007/` |
