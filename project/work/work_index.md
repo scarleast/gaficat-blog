@@ -1,7 +1,7 @@
 # Work Index
 
 - `active_work_count`: `0`
-- `current_stage_summary`: (idle)
+- `current_stage_summary`: idle
 
 ## Active Work
 
@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0009 | 2026-05-12 | Preserve Random Subtitle Author | `project/work/WI-0009/` |
 | WI-0008 | 2026-05-12 | Randomize Home Banner Subtitle | `project/work/WI-0008/` |
 | WI-0007 | 2026-05-12 | Fix Upyun Footer Logo Source | `project/work/WI-0007/` |
 | WI-0006 | 2026-05-12 | Fluid Visual Parity Review And Repair | `project/work/WI-0006/` |
