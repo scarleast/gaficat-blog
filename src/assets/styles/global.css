@@ -1106,9 +1106,16 @@ html[data-color-scheme="light"] .license-box {
   padding-right: 0;
 }
 
-.post-prevnext .post-prev i,
-.post-prevnext .post-next i {
-  font-size: 1.5rem;
+.post-prevnext .post-nav-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: 0 0 auto;
+  color: currentColor;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .post-prevnext .post-prev a,
@@ -1132,13 +1139,15 @@ html[data-color-scheme="light"] .license-box {
 
 .post-prevnext .fa-chevron-left,
 .post-prevnext .arrow-left,
-.post-prevnext .icon-arrowleft {
+.post-prevnext .icon-arrowleft,
+.post-prevnext .post-nav-icon-left {
   margin-right: 0.5rem;
 }
 
 .post-prevnext .fa-chevron-right,
 .post-prevnext .arrow-right,
-.post-prevnext .icon-arrowright {
+.post-prevnext .icon-arrowright,
+.post-prevnext .post-nav-icon-right {
   margin-left: 0.5rem;
 }
 
