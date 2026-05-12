@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0008 | 2026-05-12 | Randomize Home Banner Subtitle | `project/work/WI-0008/` |
 | WI-0007 | 2026-05-12 | Fix Upyun Footer Logo Source | `project/work/WI-0007/` |
 | WI-0006 | 2026-05-12 | Fluid Visual Parity Review And Repair | `project/work/WI-0006/` |
 | WI-0005 | 2026-05-12 | Restore Fluid Post Scroll Layering | `project/work/WI-0005/` |
