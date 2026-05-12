@@ -111,6 +111,23 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     font-size: 0.75em;
     line-height: 1.35;
   }
+
+  :global(#subtitle .subtitle-author-track) {
+    display: inline-grid;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  :global(#subtitle .subtitle-author-typed),
+  :global(#subtitle .subtitle-author-measure) {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+  }
+
+  :global(#subtitle .subtitle-author-measure) {
+    visibility: hidden;
+    pointer-events: none;
+  }
 </style>
 
 <script>
@@ -152,21 +169,35 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
         .replace(/'/g, '&#39;');
     }
 
-    function renderSubtitle(value) {
+    function renderSubtitle(value, fullValue) {
       const escaped = escapeHtml(value);
+      const escapedFullValue = escapeHtml(fullValue);
       const cursor = '<span class="typed-cursor typed-cursor--blink" aria-hidden="true">_</span>';
       const newlineIndex = escaped.indexOf('\n');
       if (newlineIndex === -1) return `${escaped}${cursor}`;
 
       const sentence = escaped.slice(0, newlineIndex);
       const attribution = escaped.slice(newlineIndex + 1).replace(/\n/g, '<br>');
-      return `${sentence}<span class="subtitle-author">${attribution}${cursor}</span>`;
+      const fullNewlineIndex = escapedFullValue.indexOf('\n');
+      const fullAttribution = fullNewlineIndex === -1
+        ? attribution
+        : escapedFullValue.slice(fullNewlineIndex + 1).replace(/\n/g, '<br>');
+
+      return [
+        sentence,
+        '<span class="subtitle-author">',
+        '<span class="subtitle-author-track">',
+        `<span class="subtitle-author-typed">${attribution}${cursor}</span>`,
+        `<span class="subtitle-author-measure" aria-hidden="true">${fullAttribution}${cursor}</span>`,
+        '</span>',
+        '</span>',
+      ].join('');
     }
 
     function type() {
       if (charIndex < text.length) {
         charIndex++;
-        el.innerHTML = renderSubtitle(text.substring(0, charIndex));
+        el.innerHTML = renderSubtitle(text.substring(0, charIndex), text);
         setTimeout(type, 100);
       }
       // Done typing — cursor keeps blinking via CSS animation
