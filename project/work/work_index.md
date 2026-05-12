@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0016 | 2026-05-12 | Stabilize Subtitle Attribution Typing | `project/work/WI-0016/` |
 | WI-0015 | 2026-05-12 | Left-To-Right Subtitle Attribution Typing | `project/work/WI-0015/` |
 | WI-0014 | 2026-05-12 | Dynamic Subtitle Attribution Alignment | `project/work/WI-0014/` |
 | WI-0013 | 2026-05-12 | Restore Home Banner Scroll Arrow | `project/work/WI-0013/` |

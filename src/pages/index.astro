@@ -113,20 +113,15 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
   }
 
   :global(#subtitle .subtitle-author-track) {
-    display: inline-grid;
+    display: inline-block;
     text-align: left;
     vertical-align: top;
-  }
-
-  :global(#subtitle .subtitle-author-typed),
-  :global(#subtitle .subtitle-author-measure) {
-    grid-area: 1 / 1;
     white-space: nowrap;
   }
 
-  :global(#subtitle .subtitle-author-measure) {
-    visibility: hidden;
-    pointer-events: none;
+  :global(#subtitle .subtitle-author-typed) {
+    display: inline-block;
+    text-align: left;
   }
 </style>
 
@@ -158,6 +153,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
 
     const fallback = el.getAttribute('data-typed-fallback') || '踏上取经路比取得真经更重要。';
     const text = await resolveRandomSubtitle(fallback);
+    const authorTrackWidth = measureAuthorTrackWidth(text);
     let charIndex = 0;
 
     function escapeHtml(value) {
@@ -169,26 +165,44 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
         .replace(/'/g, '&#39;');
     }
 
-    function renderSubtitle(value, fullValue) {
+    function getAttribution(value) {
+      const newlineIndex = value.indexOf('\n');
+      return newlineIndex === -1 ? '' : value.slice(newlineIndex + 1);
+    }
+
+    function measureAuthorTrackWidth(value) {
+      const attribution = getAttribution(value);
+      if (!attribution) return 0;
+
+      const author = document.createElement('span');
+      author.className = 'subtitle-author';
+      author.style.position = 'absolute';
+      author.style.visibility = 'hidden';
+      author.style.pointerEvents = 'none';
+      author.style.whiteSpace = 'nowrap';
+      author.style.left = '-9999px';
+      author.textContent = attribution;
+      el.appendChild(author);
+      const width = Math.ceil(author.getBoundingClientRect().width);
+      author.remove();
+      return width;
+    }
+
+    function renderSubtitle(value) {
       const escaped = escapeHtml(value);
-      const escapedFullValue = escapeHtml(fullValue);
       const cursor = '<span class="typed-cursor typed-cursor--blink" aria-hidden="true">_</span>';
       const newlineIndex = escaped.indexOf('\n');
       if (newlineIndex === -1) return `${escaped}${cursor}`;
 
       const sentence = escaped.slice(0, newlineIndex);
       const attribution = escaped.slice(newlineIndex + 1).replace(/\n/g, '<br>');
-      const fullNewlineIndex = escapedFullValue.indexOf('\n');
-      const fullAttribution = fullNewlineIndex === -1
-        ? attribution
-        : escapedFullValue.slice(fullNewlineIndex + 1).replace(/\n/g, '<br>');
+      const trackWidth = authorTrackWidth > 0 ? ` style="width: ${authorTrackWidth}px;"` : '';
 
       return [
         sentence,
         '<span class="subtitle-author">',
-        '<span class="subtitle-author-track">',
+        `<span class="subtitle-author-track"${trackWidth}>`,
         `<span class="subtitle-author-typed">${attribution}${cursor}</span>`,
-        `<span class="subtitle-author-measure" aria-hidden="true">${fullAttribution}${cursor}</span>`,
         '</span>',
         '</span>',
       ].join('');
@@ -197,7 +211,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     function type() {
       if (charIndex < text.length) {
         charIndex++;
-        el.innerHTML = renderSubtitle(text.substring(0, charIndex), text);
+        el.innerHTML = renderSubtitle(text.substring(0, charIndex));
         setTimeout(type, 100);
       }
       // Done typing — cursor keeps blinking via CSS animation
