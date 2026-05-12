@@ -94,6 +94,22 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
   </main>
 </BaseLayout>
 
+<style>
+  #subtitle {
+    display: inline-block;
+    width: min(82vw, 760px);
+    text-align: center;
+  }
+
+  :global(#subtitle .subtitle-author) {
+    display: block;
+    margin-top: 0.25rem;
+    text-align: right;
+    font-size: 0.75em;
+    line-height: 1.35;
+  }
+</style>
+
 <script>
   // Banner parallax — matching halo-theme-fluid boot.js
   function initParallax() {
@@ -133,10 +149,22 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
         .replace(/'/g, '&#39;');
     }
 
+    function renderSubtitle(value) {
+      const escaped = escapeHtml(value);
+      const newlineIndex = escaped.indexOf('\n');
+      if (newlineIndex === -1) return escaped;
+
+      const sentence = escaped.slice(0, newlineIndex);
+      const attribution = escaped.slice(newlineIndex + 1).replace(/\n/g, '<br>');
+      return attribution
+        ? `${sentence}<span class="subtitle-author">${attribution}</span>`
+        : sentence;
+    }
+
     function type() {
       if (charIndex < text.length) {
         charIndex++;
-        el.innerHTML = escapeHtml(text.substring(0, charIndex)).replace(/\n/g, '<br>');
+        el.innerHTML = renderSubtitle(text.substring(0, charIndex));
         setTimeout(type, 100);
       }
       // Done typing — cursor keeps blinking via CSS animation
