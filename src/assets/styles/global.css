@@ -358,17 +358,34 @@ html[data-color-scheme="light"] .header-transparent.navbar-scrolled {
   text-align: center;
   cursor: pointer;
   bottom: 0;
+  z-index: 5;
+  color: #fff;
 }
 
-.scroll-down-bar svg {
+.scroll-down-bar .scroll-down-icon,
+.scroll-down-bar > i,
+.scroll-down-bar > svg {
   font-size: 2rem;
   font-weight: bold;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   padding-top: 2rem;
-  color: var(--color-subtitle);
+  color: #fff;
   transform: translateZ(0);
   animation: 1.5s ease infinite scroll-down;
+}
+
+.scroll-down-bar .scroll-down-icon svg,
+.scroll-down-bar > i svg {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  padding-top: 0;
+  color: currentColor;
+  transform: none;
+  animation: none;
 }
 
 @keyframes scroll-down {
