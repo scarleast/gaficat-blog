@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0012 | 2026-05-12 | Keep Home Typewriter Cursor With Text | `project/work/WI-0012/` |
 | WI-0011 | 2026-05-12 | Right Align Home Subtitle Attribution | `project/work/WI-0011/` |
 | WI-0010 | 2026-05-12 | Make Home Subtitle Attribution Visible | `project/work/WI-0010/` |
 | WI-0009 | 2026-05-12 | Preserve Random Subtitle Author | `project/work/WI-0009/` |

@@ -45,7 +45,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3);">
           <div class="banner-text text-center fade-in-up">
             <div class="h2" style="font-size: 32px; font-weight: 500; color: #fff; line-height: 1.2;">
-              <span id="subtitle" data-typed-fallback="踏上取经路比取得真经更重要。"></span><span class="typed-cursor typed-cursor--blink" aria-hidden="true">_</span>
+              <span id="subtitle" data-typed-fallback="踏上取经路比取得真经更重要。"></span>
             </div>
           </div>
           <div class="scroll-down-bar" id="scroll-down-bar">
@@ -151,14 +151,13 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
 
     function renderSubtitle(value) {
       const escaped = escapeHtml(value);
+      const cursor = '<span class="typed-cursor typed-cursor--blink" aria-hidden="true">_</span>';
       const newlineIndex = escaped.indexOf('\n');
-      if (newlineIndex === -1) return escaped;
+      if (newlineIndex === -1) return `${escaped}${cursor}`;
 
       const sentence = escaped.slice(0, newlineIndex);
       const attribution = escaped.slice(newlineIndex + 1).replace(/\n/g, '<br>');
-      return attribution
-        ? `${sentence}<span class="subtitle-author">${attribution}</span>`
-        : sentence;
+      return `${sentence}<span class="subtitle-author">${attribution}${cursor}</span>`;
     }
 
     function type() {
