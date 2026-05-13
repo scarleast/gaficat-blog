@@ -6,9 +6,10 @@ interface Props {
   title?: string;
   poster?: string;
   aspectRatio?: string; // e.g. "16/9", "4/3"
+  autoplay?: boolean;
 }
 
-const { src, title, poster, aspectRatio = '16/9' } = Astro.props;
+const { src, title, poster, aspectRatio = '16/9', autoplay = false } = Astro.props;
 ---
 
 <div class="video-player-wrapper">
@@ -16,7 +17,7 @@ const { src, title, poster, aspectRatio = '16/9' } = Astro.props;
     <div class="video-player-title">{title}</div>
   )}
   <div class="video-player-container" style={`aspect-ratio: ${aspectRatio};`}>
-    <video controls preload="metadata" data-plyr poster={poster}>
+    <video controls preload="metadata" data-plyr poster={poster} autoplay={autoplay}>
       <source src={src} />
     </video>
   </div>

@@ -6,13 +6,15 @@ interface Props {
   aid?: string;
   page?: number;
   aspectRatio?: string;
+  autoplay?: boolean;
 }
 
-const { bvid, aid, page = 1, aspectRatio = '16/9' } = Astro.props;
+const { bvid, aid, page = 1, aspectRatio = '16/9', autoplay = false } = Astro.props;
+const autoplayValue = autoplay ? 1 : 0;
 
 const src = bvid
-  ? `//player.bilibili.com/player.html?bvid=${bvid}&page=${page}&high_quality=1&danmaku=0`
-  : `//player.bilibili.com/player.html?aid=${aid}&page=${page}&high_quality=1&danmaku=0`;
+  ? `//player.bilibili.com/player.html?bvid=${bvid}&page=${page}&high_quality=1&danmaku=0&autoplay=${autoplayValue}`
+  : `//player.bilibili.com/player.html?aid=${aid}&page=${page}&high_quality=1&danmaku=0&autoplay=${autoplayValue}`;
 ---
 
 <div class="bilibili-wrapper">
