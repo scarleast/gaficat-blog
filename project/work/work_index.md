@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0029 | 2026-05-13 | Render About Pages From Markdown | `project/work/WI-0029/` |
 | WI-0028 | 2026-05-13 | Tighten Post Caption Rhythm (closed: browser cache) | `project/work/WI-0028/` |
 | WI-0027 | 2026-05-13 | Fix Legacy Post Caption Spacing | `project/work/WI-0027/` |
 | WI-0026 | 2026-05-13 | Fix Post Image Caption Spacing | `project/work/WI-0026/` |

@@ -1,8 +1,20 @@
 ---
+import { getCollection, render } from 'astro:content';
 import PageLayout from '../../../themes/fluid-astro/layouts/PageLayout.astro';
 import AboutContent from '../../../themes/fluid-astro/components/page/AboutContent.astro';
+
+const pages = await getCollection('posts');
+const aboutPost = pages.find((post) => post.data.abbrlink === '62a44034');
+
+if (!aboutPost) {
+  throw new Error('Missing about site content: source/_posts/关于这个博客.md');
+}
+
+const { Content } = await render(aboutPost);
 ---
 
-<PageLayout title="关于" description="关于加菲猫的创客工坊">
-  <AboutContent />
+<PageLayout title="关于本站" description="关于加菲猫的创客工坊">
+  <AboutContent>
+    <Content />
+  </AboutContent>
 </PageLayout>

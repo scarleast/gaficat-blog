@@ -1,8 +1,19 @@
 ---
+import { getEntry, render } from 'astro:content';
 import PageLayout from '../../../themes/fluid-astro/layouts/PageLayout.astro';
 import AboutContent from '../../../themes/fluid-astro/components/page/AboutContent.astro';
+
+const aboutMe = await getEntry('pages', 'aboutme');
+
+if (!aboutMe) {
+  throw new Error('Missing about me content: source/_pages/aboutme.md');
+}
+
+const { Content } = await render(aboutMe);
 ---
 
-<PageLayout title="关于" description="关于加菲猫的创客工坊">
-  <AboutContent />
+<PageLayout title={aboutMe.data.title} description={aboutMe.data.description || '关于 scarleast'}>
+  <AboutContent>
+    <Content />
+  </AboutContent>
 </PageLayout>
