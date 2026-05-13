@@ -1,7 +1,10 @@
 ---
+import { fluidThemeConfig } from '../../config.mjs';
+
 // Copyright notice - Fluid-style license box shown at bottom of posts
-const siteUrl = 'https://www.gaficat.com';
+const siteUrl = fluidThemeConfig.site.url;
 const postUrl = `${siteUrl}${Astro.url.pathname}`;
+const licenseUrl = fluidThemeConfig.post.copyright.license_url;
 
 interface Props {
   title?: string;
@@ -9,7 +12,7 @@ interface Props {
   date?: Date;
 }
 
-const { title = '', author = 'scarleast', date } = Astro.props;
+const { title = '', author = fluidThemeConfig.post.copyright.author, date } = Astro.props;
 const formattedDate = date
   ? `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月${String(date.getDate()).padStart(2, '0')}日`
   : undefined;
@@ -39,7 +42,7 @@ const formattedDate = date
         <a
           class="print-no-link"
           target="_blank"
-          href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh"
+          href={licenseUrl}
           rel="external nofollow noreferrer"
           aria-label="BY - 署名"
           data-tooltip="署名"
@@ -49,7 +52,7 @@ const formattedDate = date
         <a
           class="print-no-link"
           target="_blank"
-          href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh"
+          href={licenseUrl}
           rel="external nofollow noreferrer"
           aria-label="NC - 非商业性使用"
           data-tooltip="非商业性使用"
@@ -59,7 +62,7 @@ const formattedDate = date
         <a
           class="print-no-link"
           target="_blank"
-          href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh"
+          href={licenseUrl}
           rel="external nofollow noreferrer"
           aria-label="ND - 禁止演绎"
           data-tooltip="禁止演绎"

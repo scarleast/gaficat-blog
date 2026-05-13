@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import PageLayout from '../../../themes/fluid-astro/layouts/PageLayout.astro';
 import AboutContent from '../../../themes/fluid-astro/components/page/AboutContent.astro';
+import { fluidThemeConfig } from '../../../themes/fluid-astro/config.mjs';
 
 const pages = await getCollection('posts');
 const aboutPost = pages.find((post) => post.data.abbrlink === '62a44034');
@@ -13,7 +14,7 @@ if (!aboutPost) {
 const { Content } = await render(aboutPost);
 ---
 
-<PageLayout title="关于本站" description="关于加菲猫的创客工坊">
+<PageLayout title={fluidThemeConfig.pages.about.title} description={fluidThemeConfig.pages.about.description}>
   <AboutContent>
     <Content />
   </AboutContent>

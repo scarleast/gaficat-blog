@@ -1,15 +1,16 @@
 import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
+import { fluidThemeConfig } from '../../themes/fluid-astro/config.mjs';
 
 export async function GET(context: APIContext) {
   const posts = (await getCollection('posts'))
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-    .slice(0, 20);
+    .slice(0, fluidThemeConfig.feed.limit);
 
   return rss({
-    title: '加菲猫的创客工坊',
-    description: '分享各种电子设计DIY、物联网DIY、读书笔记、生活想法、流行钢琴、工作踩坑',
+    title: fluidThemeConfig.feed.title,
+    description: fluidThemeConfig.feed.description,
     site: context.site!,
     items: posts.map((post) => ({
       title: post.data.title,
@@ -17,6 +18,6 @@ export async function GET(context: APIContext) {
       link: `/posts/${post.data.abbrlink}.html`,
       description: post.data.excerpt || '',
     })),
-    customData: '<language>zh-CN</language>',
+    customData: `<language>${fluidThemeConfig.feed.language}</language>`,
   });
 }

@@ -1,17 +1,13 @@
 ---
 import PageLayout from '../../../themes/fluid-astro/layouts/PageLayout.astro';
+import { fluidThemeConfig } from '../../../themes/fluid-astro/config.mjs';
 
-const links = [
-  {
-    name: '未上线的猫',
-    url: 'https://tobyqin.cn',
-    desc: 'Just another software engineer in testing and DevOps, join me to be Cloud Native。',
-    avatar: 'https://tobyqin.cn/assets/images/avatar.jpg',
-  },
-];
+const links = fluidThemeConfig.links.friends;
+const linkApplication = fluidThemeConfig.links.application;
+const applicationHref = `mailto:${linkApplication.email}?subject=${encodeURIComponent(linkApplication.subject)}&body=${encodeURIComponent(linkApplication.body)}`;
 ---
 
-<PageLayout title="友情链接" description="友情链接">
+<PageLayout title={fluidThemeConfig.pages.links.title} description={fluidThemeConfig.pages.links.description}>
   <div class="row links">
       {links.map((link) => (
       <div class="card col-lg-4 col-md-6 col-sm-12">
@@ -33,13 +29,13 @@ const links = [
   <div class="custom mx-auto markdown-body">
     <hr />
     <p>
-      友链申请先添加我的网站，再给我邮件：<a href="mailto:scarleast@hotmail.com?subject=友链申请&body=博客名：%0A简介：%0A链接：%0A图片：">scarleast@hotmail.com</a>，按如下格式提供信息：
+      友链申请先添加我的网站，再给我邮件：<a href={applicationHref}>{linkApplication.email}</a>，按如下格式提供信息：
     </p>
     <ul>
-      <li>博客名：加菲猫的创客工坊</li>
-      <li>简介：比取得真经更重要的是踏上取经路。</li>
-      <li>链接：https://gaficat.com</li>
-      <li>icon：https://pic.gaficat.com/halo/avatar.jpg</li>
+      <li>博客名：{linkApplication.blog_name}</li>
+      <li>简介：{linkApplication.description}</li>
+      <li>链接：{linkApplication.url}</li>
+      <li>icon：{linkApplication.icon}</li>
     </ul>
   </div>
 </PageLayout>

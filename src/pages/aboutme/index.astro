@@ -2,6 +2,7 @@
 import { getEntry, render } from 'astro:content';
 import PageLayout from '../../../themes/fluid-astro/layouts/PageLayout.astro';
 import AboutContent from '../../../themes/fluid-astro/components/page/AboutContent.astro';
+import { fluidThemeConfig } from '../../../themes/fluid-astro/config.mjs';
 
 const aboutMe = await getEntry('pages', 'aboutme');
 
@@ -12,7 +13,7 @@ if (!aboutMe) {
 const { Content } = await render(aboutMe);
 ---
 
-<PageLayout title={aboutMe.data.title} description={aboutMe.data.description || '关于 scarleast'}>
+<PageLayout title={aboutMe.data.title} description={aboutMe.data.description || fluidThemeConfig.pages.aboutme.fallback_description}>
   <AboutContent>
     <Content />
   </AboutContent>

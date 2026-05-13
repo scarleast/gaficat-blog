@@ -11,6 +11,31 @@ site:
   url: https://www.gaficat.com
   language: zh-CN
 
+author:
+  name: scarleast
+  avatar: https://pic.gaficat.com/halo/avatar.jpg
+  intro: 一只想法天马行空，行动极其缓慢的研究员,如果想给我留言，通过下面的方式联系我吧！
+  email: scarleast@hotmail.com
+  social:
+    zhihu:
+      enable: true
+      label: 知乎
+      url: https://zhihu.com/people/scarleast
+    email:
+      enable: true
+      label: 邮箱
+      url: mailto:scarleast@hotmail.com
+
+seo:
+  og_locale: zh_CN
+  twitter_card: summary_large_image
+
+feed:
+  title: 加菲猫的创客工坊
+  description: 分享各种电子设计DIY、物联网DIY、读书笔记、生活想法、流行钢琴、工作踩坑
+  language: zh-CN
+  limit: 20
+
 navbar:
   blog_title: 加菲猫的创客工坊
   menu:
@@ -49,7 +74,34 @@ post:
   read_time: true
   copyright:
     enable: true
+    author: scarleast
+    license_url: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh
   prev_next: true
+
+pages:
+  about:
+    title: 关于本站
+    description: 关于加菲猫的创客工坊
+  aboutme:
+    fallback_description: 关于 scarleast
+  links:
+    title: 友情链接
+    description: 友情链接
+
+links:
+  friends:
+    - name: 未上线的猫
+      url: https://tobyqin.cn
+      desc: Just another software engineer in testing and DevOps, join me to be Cloud Native。
+      avatar: https://tobyqin.cn/assets/images/avatar.jpg
+  application:
+    email: scarleast@hotmail.com
+    subject: 友链申请
+    body: "博客名：\n简介：\n链接：\n图片："
+    blog_name: 加菲猫的创客工坊
+    description: 比取得真经更重要的是踏上取经路。
+    url: https://gaficat.com
+    icon: https://pic.gaficat.com/halo/avatar.jpg
 
 footer:
   powered:
