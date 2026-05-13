@@ -294,6 +294,33 @@
   text-align: center;
 }
 
+.markdown-body > center:has(> img) {
+  display: block;
+  margin: 1.5rem 0 2rem;
+  text-align: center;
+}
+
+.markdown-body > center > img {
+  display: block;
+  max-width: 90%;
+  height: auto;
+  margin: 0 auto 0.45rem;
+}
+
+.markdown-body > center > br {
+  display: none;
+}
+
+.markdown-body > center > img + br + div {
+  padding: 0 !important;
+  border-bottom: 0 !important;
+  color: var(--color-text-primary) !important;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  opacity: 0.65;
+  text-align: center;
+}
+
 .markdown-body figure > figcaption:not(.image-caption) {
   display: none;
 }

@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0027 | 2026-05-13 | Fix Legacy Post Caption Spacing | `project/work/WI-0027/` |
 | WI-0026 | 2026-05-13 | Fix Post Image Caption Spacing | `project/work/WI-0026/` |
 | WI-0025 | 2026-05-13 | Improve Audio Player Visual Design | `project/work/WI-0025/` |
 | WI-0024 | 2026-05-13 | Disable Default Media Autoplay | `project/work/WI-0024/` |
