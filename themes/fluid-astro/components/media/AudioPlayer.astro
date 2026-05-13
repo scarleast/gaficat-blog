@@ -1,5 +1,5 @@
 ---
-// AudioPlayer - Plyr-based audio player component
+// AudioPlayer - Fluid-style custom audio player component
 // Usage in MDX: <AudioPlayer src="https://..." title="曲名" author="作者" />
 interface Props {
   src: string;
@@ -8,32 +8,316 @@ interface Props {
 }
 
 const { src, title, author } = Astro.props;
-const label = [title, author].filter(Boolean).join(' - ');
+const label = [title, author].filter(Boolean).join(' - ') || '音频';
 ---
 
-<div class="audio-player-wrapper">
-  {title && (
-    <div class="audio-player-title">
-      {title}{author && <span class="audio-player-author"> — {author}</span>}
-    </div>
-  )}
-  <audio controls preload="metadata" data-plyr>
+<div class="audio-player-wrapper" data-audio-player>
+  <audio class="audio-player-media" preload="metadata" data-audio-element aria-label={label}>
     <source src={src} type="audio/mpeg" />
   </audio>
+
+  <div class="audio-player-shell">
+    <button
+      class="audio-player-play"
+      type="button"
+      aria-label={`播放 ${label}`}
+      data-audio-play
+    >
+      <svg class="audio-icon audio-icon-play" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 5v14l11-7z"></path>
+      </svg>
+      <svg class="audio-icon audio-icon-pause" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 5h4v14H7zM13 5h4v14h-4z"></path>
+      </svg>
+    </button>
+
+    <div class="audio-player-main">
+      <div class="audio-player-heading">
+        <span class="audio-player-title">{title || '音频'}</span>
+        {author && <span class="audio-player-author">{author}</span>}
+      </div>
+
+      <div class="audio-player-controls">
+        <span class="audio-player-time" data-audio-current>0:00</span>
+        <input
+          class="audio-player-progress"
+          type="range"
+          min="0"
+          max="100"
+          step="0.1"
+          value="0"
+          aria-label={`调整 ${label} 播放进度`}
+          data-audio-progress
+        />
+        <span class="audio-player-time" data-audio-duration>--:--</span>
+      </div>
+    </div>
+
+    <div class="audio-player-actions">
+      <button
+        class="audio-player-action"
+        type="button"
+        aria-label={`静音 ${label}`}
+        data-audio-mute
+      >
+        <svg class="audio-icon audio-icon-volume" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9v6h4l5 4V5L8 9H4z"></path>
+          <path d="M16 8.5a5 5 0 010 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M18.5 6a8 8 0 010 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <svg class="audio-icon audio-icon-muted" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9v6h4l5 4V5L8 9H4z"></path>
+          <path d="M17 9l4 4m0-4l-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </button>
+
+      <a
+        class="audio-player-action audio-player-download"
+        href={src}
+        download
+        aria-label={`下载 ${label}`}
+      >
+        <svg class="audio-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3v11m0 0l4-4m-4 4l-4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
 </div>
 
 <style>
   .audio-player-wrapper {
-    margin: 1.5em 0;
+    margin: 1.6rem 0;
   }
-  .audio-player-title {
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-    margin-bottom: 0.25rem;
+
+  .audio-player-media {
+    display: none;
   }
-  .audio-player-wrapper audio {
+
+  .audio-player-shell {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
     width: 100%;
-    max-width: 480px;
+    padding: 0.875rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--color-line) 72%, transparent);
+    border-radius: 8px;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--color-board-bg) 94%, #fff 6%), var(--color-board-bg));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  html[data-color-scheme="light"] .audio-player-shell {
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(47, 65, 84, 0.08);
+  }
+
+  .audio-player-play,
+  .audio-player-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border: 0;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .audio-player-play {
+    width: 2.625rem;
+    height: 2.625rem;
+    border-radius: 999px;
+    background: var(--color-text-link);
+    color: #fff;
+  }
+
+  .audio-player-play:hover {
+    background: var(--color-text-link-hover);
+    transform: translateY(-1px);
+  }
+
+  .audio-player-main {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .audio-player-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    min-width: 0;
+    margin-bottom: 0.45rem;
+  }
+
+  .audio-player-title {
+    overflow: hidden;
+    color: var(--color-text-heading);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .audio-player-author {
+    flex: 0 1 auto;
+    overflow: hidden;
+    color: var(--color-text-secondary);
+    font-size: 0.82rem;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .audio-player-controls {
+    display: grid;
+    grid-template-columns: auto minmax(5rem, 1fr) auto;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .audio-player-time {
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .audio-player-progress {
+    --audio-progress: 0%;
+    width: 100%;
+    height: 1.125rem;
+    margin: 0;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .audio-player-progress::-webkit-slider-runnable-track {
+    height: 0.25rem;
+    border-radius: 999px;
+    background:
+      linear-gradient(
+        90deg,
+        var(--color-text-link) 0%,
+        var(--color-text-link) var(--audio-progress),
+        color-mix(in srgb, var(--color-line) 62%, transparent) var(--audio-progress),
+        color-mix(in srgb, var(--color-line) 62%, transparent) 100%
+      );
+  }
+
+  .audio-player-progress::-moz-range-track {
+    height: 0.25rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-line) 62%, transparent);
+  }
+
+  .audio-player-progress::-moz-range-progress {
+    height: 0.25rem;
+    border-radius: 999px;
+    background: var(--color-text-link);
+  }
+
+  .audio-player-progress::-webkit-slider-thumb {
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-top: -0.3125rem;
+    appearance: none;
+    border: 2px solid var(--color-board-bg);
+    border-radius: 999px;
+    background: var(--color-text-link);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+  }
+
+  .audio-player-progress::-moz-range-thumb {
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 2px solid var(--color-board-bg);
+    border-radius: 999px;
+    background: var(--color-text-link);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+  }
+
+  .audio-player-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .audio-player-action {
+    width: 2rem;
+    height: 2rem;
     border-radius: 6px;
+    background: transparent;
+  }
+
+  .audio-player-action:hover {
+    background: var(--color-button-hover-bg);
+    color: var(--color-text-link-hover);
+  }
+
+  .audio-player-download {
+    text-decoration: none;
+  }
+
+  .audio-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+    fill: currentColor;
+  }
+
+  .audio-icon-pause,
+  .audio-icon-muted,
+  .audio-player-wrapper.is-playing .audio-icon-play,
+  .audio-player-wrapper.is-muted .audio-icon-volume {
+    display: none;
+  }
+
+  .audio-player-wrapper.is-playing .audio-icon-pause,
+  .audio-player-wrapper.is-muted .audio-icon-muted {
+    display: block;
+  }
+
+  .audio-player-wrapper.is-loading .audio-player-play {
+    opacity: 0.72;
+    pointer-events: none;
+  }
+
+  @media (max-width: 575.98px) {
+    .audio-player-shell {
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem;
+    }
+
+    .audio-player-actions {
+      flex-direction: column;
+      gap: 0.125rem;
+    }
+
+    .audio-player-heading {
+      flex-direction: column;
+      gap: 0.125rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .audio-player-controls {
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem;
+    }
+
+    .audio-player-controls .audio-player-time:last-child {
+      grid-column: 2;
+      justify-self: end;
+    }
+
+    .audio-player-progress {
+      grid-column: 1 / -1;
+      grid-row: 1;
+    }
   }
 </style>

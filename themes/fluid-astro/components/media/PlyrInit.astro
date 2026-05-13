@@ -1,6 +1,5 @@
 ---
-// PlyrInit - Loads Plyr CSS/JS and initializes players on the page
-// Only loads if the page contains [data-plyr] elements
+// PlyrInit - Loads Plyr CSS/JS and initializes media players on the page
 ---
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr/dist/plyr.css" />
@@ -23,6 +22,109 @@
     });
   }
 
-  initPlyr();
-  document.addEventListener('astro:after-swap', initPlyr);
+  function initFluidAudioPlayers() {
+    const players = document.querySelectorAll('[data-audio-player]');
+    if (players.length === 0) return;
+
+    function formatTime(value) {
+      if (!Number.isFinite(value) || value < 0) return '--:--';
+      const minutes = Math.floor(value / 60);
+      const seconds = Math.floor(value % 60).toString().padStart(2, '0');
+      return `${minutes}:${seconds}`;
+    }
+
+    function pauseOtherAudio(currentAudio) {
+      document.querySelectorAll('[data-audio-element]').forEach((audio) => {
+        if (audio !== currentAudio) audio.pause();
+      });
+    }
+
+    players.forEach((player) => {
+      if (player.dataset.audioBound === 'true') return;
+      player.dataset.audioBound = 'true';
+
+      const audio = player.querySelector('[data-audio-element]');
+      const playButton = player.querySelector('[data-audio-play]');
+      const muteButton = player.querySelector('[data-audio-mute]');
+      const progress = player.querySelector('[data-audio-progress]');
+      const currentTime = player.querySelector('[data-audio-current]');
+      const durationTime = player.querySelector('[data-audio-duration]');
+
+      if (!audio || !playButton || !muteButton || !progress || !currentTime || !durationTime) return;
+
+      function setProgress(percent) {
+        const safePercent = Number.isFinite(percent) ? Math.min(100, Math.max(0, percent)) : 0;
+        progress.value = String(safePercent);
+        progress.style.setProperty('--audio-progress', `${safePercent}%`);
+      }
+
+      function updateTimes() {
+        currentTime.textContent = formatTime(audio.currentTime);
+        durationTime.textContent = formatTime(audio.duration);
+        const percent = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+        setProgress(percent);
+      }
+
+      function updatePlayState() {
+        const isPlaying = !audio.paused && !audio.ended;
+        player.classList.toggle('is-playing', isPlaying);
+        playButton.setAttribute('aria-label', `${isPlaying ? '暂停' : '播放'} ${audio.getAttribute('aria-label') || '音频'}`);
+      }
+
+      function updateMuteState() {
+        player.classList.toggle('is-muted', audio.muted);
+        muteButton.setAttribute('aria-label', `${audio.muted ? '取消静音' : '静音'} ${audio.getAttribute('aria-label') || '音频'}`);
+      }
+
+      playButton.addEventListener('click', () => {
+        if (audio.paused || audio.ended) {
+          pauseOtherAudio(audio);
+          player.classList.add('is-loading');
+          audio.play().catch(() => {
+            updatePlayState();
+          }).finally(() => {
+            player.classList.remove('is-loading');
+          });
+        } else {
+          audio.pause();
+        }
+      });
+
+      muteButton.addEventListener('click', () => {
+        audio.muted = !audio.muted;
+        updateMuteState();
+      });
+
+      progress.addEventListener('input', () => {
+        const percent = Number(progress.value);
+        setProgress(percent);
+        if (Number.isFinite(audio.duration)) {
+          audio.currentTime = (audio.duration * percent) / 100;
+        }
+      });
+
+      audio.addEventListener('loadedmetadata', updateTimes);
+      audio.addEventListener('durationchange', updateTimes);
+      audio.addEventListener('timeupdate', updateTimes);
+      audio.addEventListener('play', updatePlayState);
+      audio.addEventListener('pause', updatePlayState);
+      audio.addEventListener('ended', () => {
+        updatePlayState();
+        setProgress(0);
+      });
+      audio.addEventListener('volumechange', updateMuteState);
+
+      updateTimes();
+      updatePlayState();
+      updateMuteState();
+    });
+  }
+
+  function initMediaPlayers() {
+    initPlyr();
+    initFluidAudioPlayers();
+  }
+
+  initMediaPlayers();
+  document.addEventListener('astro:after-swap', initMediaPlayers);
 </script>

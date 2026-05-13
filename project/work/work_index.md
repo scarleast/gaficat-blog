@@ -8,11 +8,11 @@
 | work_id | stage | owner | title | path |
 | --- | --- | --- | --- | --- |
 
-
 ## Closed Work
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0025 | 2026-05-13 | Improve Audio Player Visual Design | `project/work/WI-0025/` |
 | WI-0024 | 2026-05-13 | Disable Default Media Autoplay | `project/work/WI-0024/` |
 | WI-0023 | 2026-05-13 | Restore Navbar Theme Toggle | `project/work/WI-0023/` |
 | WI-0022 | 2026-05-13 | Clean Repository Layout | `project/work/WI-0022/` |
