@@ -8,9 +8,12 @@ import rehypeKatex from 'rehype-katex';
 import rehypeImageCaptions from './src/utils/rehype-image-captions';
 import rehypeMediaShortcodes from './src/utils/rehype-media-shortcodes';
 import remarkMediaShortcodes from './src/utils/remark-media-shortcodes';
+import { getLegacySitemapUrls, writeLegacyRedirects } from './src/utils/legacy-sitemap-pages.mjs';
+
+const site = 'https://www.gaficat.com';
 
 export default defineConfig({
-  site: 'https://www.gaficat.com',
+  site,
   output: 'static',
   build: {
     format: 'directory',
@@ -38,7 +41,17 @@ export default defineConfig({
     },
   },
   integrations: [
-    sitemap(),
+    sitemap({
+      customPages: getLegacySitemapUrls(site),
+    }),
+    {
+      name: 'legacy-html-compatibility',
+      hooks: {
+        'astro:build:done': ({ dir }) => {
+          writeLegacyRedirects(dir, site);
+        },
+      },
+    },
     mdx(),
   ],
 });
