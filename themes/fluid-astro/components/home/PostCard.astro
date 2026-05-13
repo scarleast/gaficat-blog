@@ -58,7 +58,7 @@ const categories = getCategories(post.data.categories);
 const formattedDate = date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
 ---
 
-<!-- Index card — matching halo-theme-fluid index.html row structure -->
+<!-- Index card — matching halo-theme-fluid index row structure -->
 <div class="row mx-auto index-card">
   <article class="col-12 col-md-12 mx-auto index-info">
     <!-- Title -->
@@ -66,12 +66,12 @@ const formattedDate = date.toLocaleDateString('zh-CN', { year: 'numeric', month:
       {sticky && (
         <span class="index-pin" title="置顶">📌</span>
       )}
-      <a href={`/posts/${abbrlink}.html`}>{title}</a>
+      <a href={`/posts/${abbrlink}`}>{title}</a>
     </h2>
 
     <!-- Excerpt — matching Fluid: index-excerpt with line clamp -->
     {excerpt && (
-      <a class="index-excerpt" href={`/posts/${abbrlink}.html`}>
+      <a class="index-excerpt" href={`/posts/${abbrlink}`}>
         <div>{excerpt}</div>
       </a>
     )}
@@ -89,7 +89,7 @@ const formattedDate = date.toLocaleDateString('zh-CN', { year: 'numeric', month:
           <span class="category-chains">
             {categories.map((cat) => (
               <span class="category-chain">
-                <a href={`/categories/${encodeURIComponent(cat)}.html`} class="category-chain-item">{cat}</a>
+                <a href={`/categories/${encodeURIComponent(cat)}`} class="category-chain-item">{cat}</a>
               </span>
             ))}
           </span>
@@ -98,7 +98,7 @@ const formattedDate = date.toLocaleDateString('zh-CN', { year: 'numeric', month:
       {tags.length > 0 && (
         <div class="post-meta">
           {tags.map((tag) => (
-            <a href={`/tags/${encodeURIComponent(tag)}.html`}>#{tag}</a>
+            <a href={`/tags/${encodeURIComponent(tag)}`}>#{tag}</a>
           ))}
         </div>
       )}

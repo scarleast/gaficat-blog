@@ -18,7 +18,7 @@ const { prevPost, nextPost } = Astro.props;
   <div class="post-prevnext my-3" aria-label="文章导航">
     <article class="post-prev col-6">
       {prevPost && (
-        <a href={`/posts/${prevPost.abbrlink}.html`} title={prevPost.title}>
+        <a href={`/posts/${prevPost.abbrlink}`} title={prevPost.title}>
           <svg class="post-nav-icon post-nav-icon-left" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M15 18l-6-6 6-6"></path>
           </svg>
@@ -29,7 +29,7 @@ const { prevPost, nextPost } = Astro.props;
     </article>
     <article class="post-next col-6">
       {nextPost && (
-        <a href={`/posts/${nextPost.abbrlink}.html`} title={nextPost.title}>
+        <a href={`/posts/${nextPost.abbrlink}`} title={nextPost.title}>
           <span class="hidden-mobile">{nextPost.title}</span>
           <span class="visible-mobile">下一篇</span>
           <svg class="post-nav-icon post-nav-icon-right" viewBox="0 0 24 24" aria-hidden="true" focusable="false">

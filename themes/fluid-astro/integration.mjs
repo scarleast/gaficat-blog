@@ -5,14 +5,14 @@ const packageDir = dirname(fileURLToPath(import.meta.url));
 
 const defaultRouteMap = {
   home: { pattern: '/', entrypoint: './routes/index.astro' },
-  page: { pattern: '/page/[page].html', entrypoint: './routes/page/[page].astro' },
-  post: { pattern: '/posts/[abbrlink].html', entrypoint: './routes/posts/[abbrlink].astro' },
-  archives: { pattern: '/archives.html', entrypoint: './routes/archives/index.astro' },
-  categories: { pattern: '/categories.html', entrypoint: './routes/categories/index.astro' },
-  category: { pattern: '/categories/[...slug].html', entrypoint: './routes/categories/[...slug].astro' },
-  tags: { pattern: '/tags.html', entrypoint: './routes/tags/index.astro' },
-  tag: { pattern: '/tags/[tag].html', entrypoint: './routes/tags/[tag].astro' },
-  links: { pattern: '/links.html', entrypoint: './routes/links/index.astro' },
+  page: { pattern: '/page/[page]', entrypoint: './routes/page/[page].astro' },
+  post: { pattern: '/posts/[abbrlink]', entrypoint: './routes/posts/[abbrlink].astro' },
+  archives: { pattern: '/archives', entrypoint: './routes/archives/index.astro' },
+  categories: { pattern: '/categories', entrypoint: './routes/categories/index.astro' },
+  category: { pattern: '/categories/[...slug]', entrypoint: './routes/categories/[...slug].astro' },
+  tags: { pattern: '/tags', entrypoint: './routes/tags/index.astro' },
+  tag: { pattern: '/tags/[tag]', entrypoint: './routes/tags/[tag].astro' },
+  links: { pattern: '/links', entrypoint: './routes/links/index.astro' },
 };
 
 /**

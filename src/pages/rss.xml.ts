@@ -15,9 +15,10 @@ export async function GET(context: APIContext) {
     items: posts.map((post) => ({
       title: post.data.title,
       pubDate: post.data.date,
-      link: `/posts/${post.data.abbrlink}.html`,
+      link: `/posts/${post.data.abbrlink}`,
       description: post.data.excerpt || '',
     })),
     customData: `<language>${fluidThemeConfig.feed.language}</language>`,
+    trailingSlash: false,
   });
 }

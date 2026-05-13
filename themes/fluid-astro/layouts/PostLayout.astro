@@ -42,7 +42,7 @@ const formattedDate = date.toLocaleDateString('zh-CN', {
   day: '2-digit',
 });
 
-const postUrl = `${fluidThemeConfig.site.url}/posts/${abbrlink}.html`;
+const postUrl = `${fluidThemeConfig.site.url}/posts/${abbrlink}`;
 const hasToc = headings && headings.filter((h) => h.depth >= 2 && h.depth <= 3).length > 0;
 
 function getCategories(cat: string[] | string[][] | string): string[] {
@@ -66,7 +66,7 @@ const bottomCategories = getCategories(categories);
 >
   <ReadingProgress />
 
-  <!-- Banner with post title and meta — matching halo-theme-fluid banner-post.html -->
+  <!-- Banner with post title and meta — matching halo-theme-fluid banner-post -->
   <div class="header-inner" style={`height: ${fluidThemeConfig.banner.post_height};`}>
     <div id="banner" class="banner" style={fluidBannerStyle()} parallax={String(fluidThemeConfig.banner.parallax)}>
       <div class="full-bg-img">
@@ -97,7 +97,7 @@ const bottomCategories = getCategories(categories);
     </div>
   </div>
 
-  <!-- Post layout — matching halo-theme-fluid post.html structure -->
+  <!-- Post layout — matching halo-theme-fluid post structure -->
   <main>
     <div class="container-fluid nopadding-x">
       <div class="row nomargin-x">
@@ -129,7 +129,7 @@ const bottomCategories = getCategories(categories);
                           <span class="category-chains">
                             {bottomCategories.map((cat) => (
                               <span class="category-chain">
-                                <a href={`/categories/${encodeURIComponent(cat)}.html`} class="category-chain-item print-no-link">{cat}</a>
+                                <a href={`/categories/${encodeURIComponent(cat)}`} class="category-chain-item print-no-link">{cat}</a>
                               </span>
                             ))}
                           </span>
@@ -142,7 +142,7 @@ const bottomCategories = getCategories(categories);
                             <path fill="currentColor" d="M20.6 13.2l-7.4 7.4a2 2 0 01-2.8 0l-7-7A2 2 0 012.8 12V4a2 2 0 012-2h8a2 2 0 011.4.6l6.4 6.4a3 3 0 010 4.2zM7.5 8A1.5 1.5 0 109 6.5 1.5 1.5 0 007.5 8z" />
                           </svg>
                           {tags.map((tag) => (
-                            <a href={`/tags/${encodeURIComponent(tag)}.html`} class="post-tag print-no-link">#{tag}</a>
+                            <a href={`/tags/${encodeURIComponent(tag)}`} class="post-tag print-no-link">#{tag}</a>
                           ))}
                         </div>
                       )}

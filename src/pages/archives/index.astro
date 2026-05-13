@@ -29,7 +29,7 @@ const years = [...postsByYear.keys()].sort((a, b) => b - a);
             return (
               <li class="archive-post">
                 <time class="archive-post-date">{date}</time>
-                <a href={`/posts/${post.data.abbrlink}.html`} class="archive-post-title">
+                <a href={`/posts/${post.data.abbrlink}`} class="archive-post-title">
                   {post.data.title}
                 </a>
               </li>

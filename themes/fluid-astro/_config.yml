@@ -65,7 +65,7 @@ index:
     random: true
     hitokoto: true
     jinrishici: true
-  post_url: /posts/:abbrlink.html
+  post_url: /posts/:abbrlink
   per_page: 10
 
 post:

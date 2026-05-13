@@ -81,7 +81,7 @@ function buildFluidThemeConfig(config) {
       jinrishici: true,
       ...(config.index?.slogan || {}),
     },
-    post_url: '/posts/:abbrlink.html',
+    post_url: '/posts/:abbrlink',
     per_page: 10,
     ...(config.index || {}),
   },

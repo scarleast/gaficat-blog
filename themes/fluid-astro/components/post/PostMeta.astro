@@ -55,7 +55,7 @@ const formattedDate = date.toLocaleDateString('zh-CN', {
       </svg>
       {categoryList.map((cat, i) => (
         <a
-          href={`/categories/${cat}.html`}
+          href={`/categories/${cat}`}
           class="hover:text-[var(--color-text-link-hover)] transition-colors"
         >
           {cat}{i < categoryList.length - 1 ? ', ' : ''}
@@ -72,7 +72,7 @@ const formattedDate = date.toLocaleDateString('zh-CN', {
       </svg>
       {tags.map((tag) => (
         <a
-          href={`/tags/${tag}.html`}
+          href={`/tags/${tag}`}
           class="px-2 py-0.5 rounded bg-[var(--color-body-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-link-hover)] transition-colors text-xs"
         >
           #{tag}

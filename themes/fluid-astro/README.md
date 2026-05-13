@@ -78,14 +78,14 @@ The integration injects these routes by default:
 | key | pattern | entrypoint |
 | --- | --- | --- |
 | `home` | `/` | `routes/index.astro` |
-| `page` | `/page/[page].html` | `routes/page/[page].astro` |
-| `post` | `/posts/[abbrlink].html` | `routes/posts/[abbrlink].astro` |
-| `archives` | `/archives.html` | `routes/archives/index.astro` |
-| `categories` | `/categories.html` | `routes/categories/index.astro` |
-| `category` | `/categories/[...slug].html` | `routes/categories/[...slug].astro` |
-| `tags` | `/tags.html` | `routes/tags/index.astro` |
-| `tag` | `/tags/[tag].html` | `routes/tags/[tag].astro` |
-| `links` | `/links.html` | `routes/links/index.astro` |
+| `page` | `/page/[page]` | `routes/page/[page].astro` |
+| `post` | `/posts/[abbrlink]` | `routes/posts/[abbrlink].astro` |
+| `archives` | `/archives` | `routes/archives/index.astro` |
+| `categories` | `/categories` | `routes/categories/index.astro` |
+| `category` | `/categories/[...slug]` | `routes/categories/[...slug].astro` |
+| `tags` | `/tags` | `routes/tags/index.astro` |
+| `tag` | `/tags/[tag]` | `routes/tags/[tag].astro` |
+| `links` | `/links` | `routes/links/index.astro` |
 
 Disable all route injection when the host already owns its routes:
 

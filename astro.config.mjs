@@ -13,7 +13,7 @@ export default defineConfig({
   site: 'https://www.gaficat.com',
   output: 'static',
   build: {
-    format: 'file',
+    format: 'directory',
   },
   trailingSlash: 'never',
   markdown: {

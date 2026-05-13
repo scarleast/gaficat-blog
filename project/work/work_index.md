@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0035 | 2026-05-13 | Normalize Canonical URLs, Sitemap, And Feed | `project/work/WI-0035/` |
 | WI-0034 | 2026-05-13 | Add Hexo-Style Media Shortcodes | `project/work/WI-0034/` |
 | WI-0033 | 2026-05-13 | Inject Fluid Astro Blog Routes | `project/work/WI-0033/` |
 | WI-0032 | 2026-05-13 | Add Fluid Astro Integration Entrypoint | `project/work/WI-0032/` |

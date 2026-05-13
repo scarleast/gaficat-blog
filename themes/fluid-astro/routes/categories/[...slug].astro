@@ -34,7 +34,7 @@ const { category, posts } = Astro.props;
 
 <PageLayout title={`分类：${category}`} description={`分类 "${category}" 下的所有文章`}>
   <div style="margin-bottom: 1rem;">
-    <a href="/categories.html" style="font-size: 0.85rem; color: var(--color-text-link-hover);">← 所有分类</a>
+    <a href="/categories" style="font-size: 0.85rem; color: var(--color-text-link-hover);">← 所有分类</a>
   </div>
 
   {posts.map((post) => (

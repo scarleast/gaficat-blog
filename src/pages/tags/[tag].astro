@@ -25,7 +25,7 @@ const { tag, posts } = Astro.props;
 
 <PageLayout title={`标签：${tag}`} description={`标签 "${tag}" 下的所有文章`}>
   <div style="margin-bottom: 1rem;">
-    <a href="/tags.html" style="font-size: 0.85rem; color: var(--color-text-link-hover);">← 所有标签</a>
+    <a href="/tags" style="font-size: 0.85rem; color: var(--color-text-link-hover);">← 所有标签</a>
   </div>
 
   {posts.map((post) => (

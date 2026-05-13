@@ -53,7 +53,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
 ---
 
 <BaseLayout title={`第 ${currentPage} 页 - ${fluidThemeConfig.site.title}`} description={fluidThemeConfig.site.description}>
-  <!-- Banner — matching halo-theme-fluid banner.html -->
+  <!-- Banner — matching halo-theme-fluid banner -->
   <div class="header-inner" style={`height: ${fluidThemeConfig.banner.index_height};`}>
     <div id="banner" class="banner" style={fluidBannerStyle()} parallax={String(fluidThemeConfig.banner.parallax)}>
       <div class="full-bg-img">
@@ -75,7 +75,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     </div>
   </div>
 
-  <!-- Post List — matching halo-theme-fluid index.html structure -->
+  <!-- Post List — matching halo-theme-fluid index structure -->
   <main>
     <div class="container nopadding-x-md">
       <div id="board" style="margin-top: 0">
@@ -93,7 +93,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
                     <a
                       class="extend prev"
                       rel="prev"
-                      href={currentPage === 2 ? '/' : `/page/${currentPage - 1}.html`}
+                      href={currentPage === 2 ? '/' : `/page/${currentPage - 1}`}
                     >‹</a>
                   )}
                   {pageNumbers.map((page) => (
@@ -102,11 +102,11 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
                     ) : page === currentPage ? (
                       <span class="current">{page}</span>
                     ) : (
-                      <a class="page-number" href={page === 1 ? '/' : `/page/${page}.html`}>{page}</a>
+                      <a class="page-number" href={page === 1 ? '/' : `/page/${page}`}>{page}</a>
                     )
                   ))}
                   {currentPage < totalPages && (
-                    <a class="extend next" rel="next" href={`/page/${currentPage + 1}.html`}>›</a>
+                    <a class="extend next" rel="next" href={`/page/${currentPage + 1}`}>›</a>
                   )}
                 </nav>
               )}

@@ -45,7 +45,7 @@ export async function GET() {
 
       return {
         title: post.data.title,
-        url: `/posts/${post.data.abbrlink}.html`,
+        url: `/posts/${post.data.abbrlink}`,
         date: post.data.date.toISOString(),
         tags: post.data.tags,
         categories,
