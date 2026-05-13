@@ -247,7 +247,7 @@ const lightThemeColor = fluidThemeConfig.color.theme_color.light;
     };
   }
 
-  let activeHeaderScrollHandler: (() => void) | undefined;
+  let activeHeaderScrollHandler;
 
   function initHeaderScroll() {
     const header = document.getElementById('site-header');
