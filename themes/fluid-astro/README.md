@@ -43,8 +43,37 @@ import { fluidThemeConfig } from '@gaficat/fluid-astro/config';
 ---
 ```
 
+## Astro Integration
+
+Add the integration to the host project's `astro.config.mjs` to prepare Fluid
+config resolution and useful package aliases:
+
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import fluidAstro from '@gaficat/fluid-astro/integration';
+
+export default defineConfig({
+  integrations: [
+    fluidAstro({
+      config: './fluid.config.yml',
+      alias: '@fluid-astro',
+    }),
+  ],
+});
+```
+
+With that alias, host routes can import theme modules like this:
+
+```astro
+---
+import PostLayout from '@fluid-astro/layouts/PostLayout.astro';
+import { fluidThemeConfig } from '@fluid-astro/config';
+---
+```
+
 Use a host-owned config file by setting `FLUID_ASTRO_CONFIG` before running
-Astro:
+Astro, or by passing `config` to the integration:
 
 ```bash
 FLUID_ASTRO_CONFIG=./fluid.config.yml npm run dev
@@ -111,7 +140,9 @@ const { Content, headings } = await post.render();
 ## Current Limits
 
 - Route generation is not bundled as an Astro integration.
+- The current integration prepares config and aliases; it does not create
+  `src/pages/**` routes or content collections.
 - Post, category, and tag URLs currently follow this site's URL conventions.
 - Config is loaded at module evaluation time. Set `FLUID_ASTRO_CONFIG` before
-  Astro imports theme modules.
+  Astro imports theme modules, or use the integration `config` option.
 - This package has not been published to npm yet.

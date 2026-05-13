@@ -15,6 +15,7 @@
     "README.md",
     "_config.yml",
     "config.mjs",
+    "integration.mjs",
     "layouts",
     "components",
     "assets/styles"
@@ -23,6 +24,8 @@
     ".": "./config.mjs",
     "./config": "./config.mjs",
     "./config.mjs": "./config.mjs",
+    "./integration": "./integration.mjs",
+    "./integration.mjs": "./integration.mjs",
     "./_config.yml": "./_config.yml",
     "./layouts/BaseLayout.astro": "./layouts/BaseLayout.astro",
     "./layouts/PageLayout.astro": "./layouts/PageLayout.astro",
