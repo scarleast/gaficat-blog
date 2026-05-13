@@ -15,7 +15,8 @@
 
 ## Commit
 
-- pending; commit will be created after final status check.
+- commit: `d27bcbb` Split modern and legacy feed sitemap outputs
+- push: not run because this repository has no configured remote.
 
 ## Follow-ups
 
