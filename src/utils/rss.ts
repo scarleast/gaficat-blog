@@ -3,7 +3,19 @@ import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
 import { fluidThemeConfig } from '../../themes/fluid-astro/config.mjs';
 
-export async function buildRssResponse(context: APIContext) {
+type FeedUrlMode = 'modern' | 'legacy';
+
+interface BuildRssOptions {
+  urlMode?: FeedUrlMode;
+}
+
+function postLink(abbrlink: string, urlMode: FeedUrlMode) {
+  const path = `/posts/${abbrlink}`;
+  return urlMode === 'legacy' ? `${path}.html` : path;
+}
+
+export async function buildRssResponse(context: APIContext, options: BuildRssOptions = {}) {
+  const urlMode = options.urlMode ?? 'modern';
   const posts = (await getCollection('posts'))
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
     .slice(0, fluidThemeConfig.feed.limit);
@@ -15,7 +27,7 @@ export async function buildRssResponse(context: APIContext) {
     items: posts.map((post) => ({
       title: post.data.title,
       pubDate: post.data.date,
-      link: `/posts/${post.data.abbrlink}`,
+      link: postLink(post.data.abbrlink, urlMode),
       description: post.data.excerpt || '',
     })),
     customData: `<language>${fluidThemeConfig.feed.language}</language>`,

@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0037 | 2026-05-13 | Split Modern And Legacy Feed Sitemap Outputs | `project/work/WI-0037/` |
 | WI-0036 | 2026-05-13 | Add Legacy Feed And HTML URL Compatibility | `project/work/WI-0036/` |
 | WI-0035 | 2026-05-13 | Normalize Canonical URLs, Sitemap, And Feed | `project/work/WI-0035/` |
 | WI-0034 | 2026-05-13 | Add Hexo-Style Media Shortcodes | `project/work/WI-0034/` |
