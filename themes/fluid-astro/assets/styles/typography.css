@@ -145,7 +145,7 @@
 }
 
 .markdown-body figure {
-  margin: 0;
+  margin: 1.5rem 0 2rem;
 }
 
 .markdown-body :not(pre) > code,
@@ -248,7 +248,7 @@
 .markdown-body figure > img,
 .markdown-body figure > a > img {
   max-width: 90%;
-  margin: 1.5rem auto;
+  margin: 0 auto 0.45rem;
   display: block;
   box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
   border-radius: 4px;
@@ -258,8 +258,38 @@
 .markdown-body figure > figcaption.image-caption {
   color: var(--color-text-primary);
   font-size: 0.8rem;
-  line-height: 1;
-  margin: -0.75rem auto 2rem;
+  line-height: 1.4;
+  margin: 0 auto;
+  opacity: 0.65;
+  text-align: center;
+}
+
+.markdown-body > div[style*="text-align:center"]:has(> img),
+.markdown-body > div[style*="text-align: center"]:has(> img) {
+  margin: 1.5rem 0 2rem;
+  text-align: center;
+}
+
+.markdown-body > div[style*="text-align:center"] > img,
+.markdown-body > div[style*="text-align: center"] > img {
+  display: block;
+  max-width: 90%;
+  height: auto;
+  margin: 0 auto 0.45rem;
+  zoom: normal !important;
+}
+
+.markdown-body > div[style*="text-align:center"] > br,
+.markdown-body > div[style*="text-align: center"] > br {
+  display: none;
+}
+
+.markdown-body > div[style*="text-align:center"] > img + br + div,
+.markdown-body > div[style*="text-align: center"] > img + br + div {
+  padding: 0 !important;
+  color: var(--color-text-primary) !important;
+  font-size: 0.8rem;
+  line-height: 1.4;
   opacity: 0.65;
   text-align: center;
 }
