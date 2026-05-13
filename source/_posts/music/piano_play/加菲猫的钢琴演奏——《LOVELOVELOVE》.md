@@ -12,13 +12,10 @@ math: false
 toc: true
 ---
 
-import Bilibili from '../../../../themes/fluid-astro/components/media/Bilibili.astro';
-
 #  开头先说两句
 
 这首曲子是**FTISLAND**的《LOVE LOVE LOVE》，很喜欢这首歌，后来偶然的机会在youtube上看到了钢琴的版本，于是便找到了谱子，弹了下来。
 
-<Bilibili bvid="BV19x41147R1" />
+{% bilibili BV19x41147R1 %}
 
 其他钢琴视频参见[演奏分类](https://www.gaficat.com/tags/演奏/)~
-

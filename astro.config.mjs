@@ -6,6 +6,8 @@ import mdx from '@astrojs/mdx';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeImageCaptions from './src/utils/rehype-image-captions';
+import rehypeMediaShortcodes from './src/utils/rehype-media-shortcodes';
+import remarkMediaShortcodes from './src/utils/remark-media-shortcodes';
 
 export default defineConfig({
   site: 'https://www.gaficat.com',
@@ -24,8 +26,8 @@ export default defineConfig({
         table: 'plaintext',
       },
     },
-    remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeKatex, rehypeImageCaptions],
+    remarkPlugins: [remarkMath, remarkMediaShortcodes],
+    rehypePlugins: [rehypeKatex, rehypeMediaShortcodes, rehypeImageCaptions],
   },
   vite: {
     plugins: [tailwindcss()],

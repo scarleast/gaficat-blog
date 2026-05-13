@@ -33,6 +33,7 @@ function getExcerpt(excerpt?: string, body?: string): string {
     .replace(/<AudioPlayer[^>]*\/>/g, '')
     .replace(/<VideoPlayer[^>]*\/>/g, '')
     .replace(/<Bilibili[^>]*\/>/g, '')
+    .replace(/\{%\s*(?:bilibili|audio|video)\b[\s\S]*?%\}/g, '')
     .replace(/import\s.*from.*/g, '')
     .replace(/\{?\s*\.\.\..*/g, '')
     .replace(/[*_~>|]/g, '')

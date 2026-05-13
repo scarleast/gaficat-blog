@@ -12,13 +12,11 @@ math: false
 toc: true
 ---
 
-import VideoPlayer from '../../../themes/fluid-astro/components/media/VideoPlayer.astro';
-
 # 摘要
 
 你是否想过，在别人访问你网站的时候，能动态的展示一句话呢？这句话可能是根据访客的地理位置、时间、天气返回的诗句，可能是网抑云上生而为人我很抱歉的评论？本篇文章介绍了如何给hexo的fluid主题的打字机特效插入Hitokoto和今日诗词，实现上面效果。
 
-{/* more */}
+<!-- more -->
 
 # 前言
 
@@ -28,7 +26,7 @@ import VideoPlayer from '../../../themes/fluid-astro/components/media/VideoPlaye
 
 本篇文章介绍了如何给hexo的fluid主题的打字机特效（打字机特效就是下面这个动图显示的效果），插入一言，先来看一下效果吧~
 
-<VideoPlayer src="https://pic.gaficat.com/default/打字机一言效果.mov" title="打字机一言效果" />
+{% video src="https://pic.gaficat.com/default/打字机一言效果.mov" title="打字机一言效果" %}
 
 当然啦，也可以直接访问本站的[首页](https://www.gaficat.com)，查看实际的效果：随机调用[Hitokoto](https://hitokoto.cn/)和[今日诗词](https://www.jinrishici.com/)其中一个显示副标题。
 
