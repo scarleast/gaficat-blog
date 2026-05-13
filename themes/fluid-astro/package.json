@@ -1,0 +1,43 @@
+{
+  "name": "@gaficat/fluid-astro",
+  "version": "0.1.0",
+  "description": "Fluid-inspired Astro theme components, layouts, styles, and config loader.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "astro",
+    "astro-theme",
+    "blog",
+    "fluid",
+    "hexo"
+  ],
+  "files": [
+    "README.md",
+    "_config.yml",
+    "config.mjs",
+    "layouts",
+    "components",
+    "assets/styles"
+  ],
+  "exports": {
+    ".": "./config.mjs",
+    "./config": "./config.mjs",
+    "./config.mjs": "./config.mjs",
+    "./_config.yml": "./_config.yml",
+    "./layouts/BaseLayout.astro": "./layouts/BaseLayout.astro",
+    "./layouts/PageLayout.astro": "./layouts/PageLayout.astro",
+    "./layouts/PostLayout.astro": "./layouts/PostLayout.astro",
+    "./components/*": "./components/*",
+    "./assets/styles/*": "./assets/styles/*"
+  },
+  "peerDependencies": {
+    "astro": ">=5.0.0 || >=6.0.0",
+    "plyr": "^3.8.0"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

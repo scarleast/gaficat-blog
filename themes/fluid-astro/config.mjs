@@ -1,20 +1,38 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
 
-const configPath = resolve(process.cwd(), 'themes/fluid-astro/_config.yml');
+const packageDir = dirname(fileURLToPath(import.meta.url));
+const packageConfigPath = resolve(packageDir, '_config.yml');
+
+function resolveConfigPath() {
+  if (process.env.FLUID_ASTRO_CONFIG) {
+    return resolve(process.cwd(), process.env.FLUID_ASTRO_CONFIG);
+  }
+
+  const hostThemeConfigPath = resolve(process.cwd(), 'themes/fluid-astro/_config.yml');
+  if (existsSync(hostThemeConfigPath)) {
+    return hostThemeConfigPath;
+  }
+
+  return packageConfigPath;
+}
+
+const configPath = resolveConfigPath();
 const loaded = yaml.load(readFileSync(configPath, 'utf8')) || {};
 
 export const fluidThemeConfigPath = configPath;
 
-export const fluidThemeConfig = {
+function buildFluidThemeConfig(config) {
+  return {
   site: {
     title: '',
     subtitle: '',
     description: '',
     url: '',
     language: 'zh-CN',
-    ...(loaded.site || {}),
+    ...(config.site || {}),
   },
   author: {
     name: '',
@@ -22,29 +40,29 @@ export const fluidThemeConfig = {
     intro: '',
     email: '',
     social: {
-      zhihu: { enable: false, label: '', url: '', ...(loaded.author?.social?.zhihu || {}) },
-      email: { enable: false, label: '', url: '', ...(loaded.author?.social?.email || {}) },
+      zhihu: { enable: false, label: '', url: '', ...(config.author?.social?.zhihu || {}) },
+      email: { enable: false, label: '', url: '', ...(config.author?.social?.email || {}) },
     },
-    ...Object.fromEntries(Object.entries(loaded.author || {}).filter(([key]) => key !== 'social')),
+    ...Object.fromEntries(Object.entries(config.author || {}).filter(([key]) => key !== 'social')),
   },
   seo: {
     og_locale: 'zh_CN',
     twitter_card: 'summary_large_image',
-    ...(loaded.seo || {}),
+    ...(config.seo || {}),
   },
   feed: {
-    title: loaded.site?.title || '',
-    description: loaded.site?.description || '',
-    language: loaded.site?.language || 'zh-CN',
+    title: config.site?.title || '',
+    description: config.site?.description || '',
+    language: config.site?.language || 'zh-CN',
     limit: 20,
-    ...(loaded.feed || {}),
+    ...(config.feed || {}),
   },
   navbar: {
-    blog_title: loaded.site?.title || '',
+    blog_title: config.site?.title || '',
     menu: [],
     search: true,
     color_toggle: true,
-    ...(loaded.navbar || {}),
+    ...(config.navbar || {}),
   },
   banner: {
     image: '',
@@ -53,19 +71,19 @@ export const fluidThemeConfig = {
     index_height: '100vh',
     post_height: '70vh',
     page_height: '60vh',
-    ...(loaded.banner || {}),
+    ...(config.banner || {}),
   },
   index: {
     slogan: {
-      text: loaded.site?.subtitle || '',
+      text: config.site?.subtitle || '',
       random: true,
       hitokoto: true,
       jinrishici: true,
-      ...(loaded.index?.slogan || {}),
+      ...(config.index?.slogan || {}),
     },
     post_url: '/posts/:abbrlink.html',
     per_page: 10,
-    ...(loaded.index || {}),
+    ...(config.index || {}),
   },
   post: {
     toc: true,
@@ -73,50 +91,50 @@ export const fluidThemeConfig = {
     read_time: true,
     copyright: {
       enable: true,
-      author: loaded.author?.name || '',
+      author: config.author?.name || '',
       license_url: '',
-      ...(loaded.post?.copyright || {}),
+      ...(config.post?.copyright || {}),
     },
     prev_next: true,
-    ...Object.fromEntries(Object.entries(loaded.post || {}).filter(([key]) => key !== 'copyright')),
+    ...Object.fromEntries(Object.entries(config.post || {}).filter(([key]) => key !== 'copyright')),
   },
   pages: {
     about: {
       title: '',
       description: '',
-      ...(loaded.pages?.about || {}),
+      ...(config.pages?.about || {}),
     },
     aboutme: {
-      fallback_description: loaded.author?.name ? `关于 ${loaded.author.name}` : '',
-      ...(loaded.pages?.aboutme || {}),
+      fallback_description: config.author?.name ? `关于 ${config.author.name}` : '',
+      ...(config.pages?.aboutme || {}),
     },
     links: {
       title: '',
       description: '',
-      ...(loaded.pages?.links || {}),
+      ...(config.pages?.links || {}),
     },
-    ...Object.fromEntries(Object.entries(loaded.pages || {}).filter(([key]) => !['about', 'aboutme', 'links'].includes(key))),
+    ...Object.fromEntries(Object.entries(config.pages || {}).filter(([key]) => !['about', 'aboutme', 'links'].includes(key))),
   },
   links: {
-    friends: loaded.links?.friends || [],
+    friends: config.links?.friends || [],
     application: {
-      email: loaded.author?.email || '',
+      email: config.author?.email || '',
       subject: '',
       body: '',
-      blog_name: loaded.site?.title || '',
-      description: loaded.site?.subtitle || '',
-      url: loaded.site?.url || '',
-      icon: loaded.author?.avatar || '',
-      ...(loaded.links?.application || {}),
+      blog_name: config.site?.title || '',
+      description: config.site?.subtitle || '',
+      url: config.site?.url || '',
+      icon: config.author?.avatar || '',
+      ...(config.links?.application || {}),
     },
-    ...Object.fromEntries(Object.entries(loaded.links || {}).filter(([key]) => !['friends', 'application'].includes(key))),
+    ...Object.fromEntries(Object.entries(config.links || {}).filter(([key]) => !['friends', 'application'].includes(key))),
   },
   footer: {
     powered: {
       enable: true,
-      generator: { name: '', url: '', ...(loaded.footer?.powered?.generator || {}) },
-      theme: { name: '', url: '', ...(loaded.footer?.powered?.theme || {}) },
-      ...Object.fromEntries(Object.entries(loaded.footer?.powered || {}).filter(([key]) => !['generator', 'theme'].includes(key))),
+      generator: { name: '', url: '', ...(config.footer?.powered?.generator || {}) },
+      theme: { name: '', url: '', ...(config.footer?.powered?.theme || {}) },
+      ...Object.fromEntries(Object.entries(config.footer?.powered || {}).filter(([key]) => !['generator', 'theme'].includes(key))),
     },
     upyun: {
       enable: true,
@@ -124,29 +142,32 @@ export const fluidThemeConfig = {
       text_suffix: '',
       url: '',
       logo: '',
-      ...(loaded.footer?.upyun || {}),
+      ...(config.footer?.upyun || {}),
     },
     beian: {
-      icp: { text: '', url: '', ...(loaded.footer?.beian?.icp || {}) },
-      police: { text: '', url: '', icon: '', ...(loaded.footer?.beian?.police || {}) },
-      ...Object.fromEntries(Object.entries(loaded.footer?.beian || {}).filter(([key]) => !['icp', 'police'].includes(key))),
+      icp: { text: '', url: '', ...(config.footer?.beian?.icp || {}) },
+      police: { text: '', url: '', icon: '', ...(config.footer?.beian?.police || {}) },
+      ...Object.fromEntries(Object.entries(config.footer?.beian || {}).filter(([key]) => !['icp', 'police'].includes(key))),
     },
-    ...Object.fromEntries(Object.entries(loaded.footer || {}).filter(([key]) => !['powered', 'upyun', 'beian'].includes(key))),
+    ...Object.fromEntries(Object.entries(config.footer || {}).filter(([key]) => !['powered', 'upyun', 'beian'].includes(key))),
   },
   dark_mode: {
     enable: true,
     default: 'dark',
-    ...(loaded.dark_mode || {}),
+    ...(config.dark_mode || {}),
   },
   color: {
     theme_color: {
       dark: '#1f3144',
       light: '#2f4154',
-      ...(loaded.color?.theme_color || {}),
+      ...(config.color?.theme_color || {}),
     },
-    ...(loaded.color || {}),
+    ...(config.color || {}),
   },
-};
+  };
+}
+
+export const fluidThemeConfig = buildFluidThemeConfig(loaded);
 
 export function fluidBannerStyle() {
   return `background-image: url('${fluidThemeConfig.banner.image}');`;
@@ -154,4 +175,9 @@ export function fluidBannerStyle() {
 
 export function fluidMaskStyle() {
   return `background-color: rgba(0, 0, 0, ${fluidThemeConfig.banner.mask_alpha});`;
+}
+
+export function loadFluidThemeConfig(configFilePath = fluidThemeConfigPath) {
+  const config = yaml.load(readFileSync(resolve(process.cwd(), configFilePath), 'utf8')) || {};
+  return buildFluidThemeConfig(config);
 }
