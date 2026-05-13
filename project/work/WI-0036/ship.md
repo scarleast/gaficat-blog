@@ -15,7 +15,7 @@
 
 ## Commit
 
-- commit: created during WI-0036 `/ship`; see git history for the final hash.
+- commit: `97ea2ce` Add legacy feed and html URL compatibility
 - push: not run because this repository has no configured remote.
 
 ## Follow-ups
