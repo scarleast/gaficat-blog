@@ -19,6 +19,7 @@
   - `97ea2ce` Add legacy feed and html URL compatibility
   - `8d51b2e` Record WI-0036 ship commit
   - `9f67009` Update WI-0036 ship record
+  - `7b98643` Close WI-0036 ship record
 - push: not run because this repository has no configured remote.
 
 ## Follow-ups
