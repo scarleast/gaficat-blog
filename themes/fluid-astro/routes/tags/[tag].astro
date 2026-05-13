@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+import PageLayout from '../../layouts/PageLayout.astro';
+import PostCard from '../../components/home/PostCard.astro';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts');
+  const tagMap = new Map<string, typeof allPosts>();
+
+  allPosts.forEach((post) => {
+    post.data.tags.forEach((tag) => {
+      if (!tagMap.has(tag)) tagMap.set(tag, []);
+      tagMap.get(tag)!.push(post);
+    });
+  });
+
+  return [...tagMap.entries()].map(([tag, posts]) => ({
+    params: { tag },
+    props: { tag, posts: posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()) },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<PageLayout title={`标签：${tag}`} description={`标签 "${tag}" 下的所有文章`}>
+  <div style="margin-bottom: 1rem;">
+    <a href="/tags.html" style="font-size: 0.85rem; color: var(--color-text-link-hover);">← 所有标签</a>
+  </div>
+
+  {posts.map((post) => (
+    <PostCard post={post} />
+  ))}
+</PageLayout>

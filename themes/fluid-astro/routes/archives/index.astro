@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+import PageLayout from '../../layouts/PageLayout.astro';
+
+const allPosts = (await getCollection('posts'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Group by year
+const postsByYear = new Map<number, typeof allPosts>();
+allPosts.forEach((post) => {
+  const year = post.data.date.getFullYear();
+  if (!postsByYear.has(year)) postsByYear.set(year, []);
+  postsByYear.get(year)!.push(post);
+});
+
+const years = [...postsByYear.keys()].sort((a, b) => b - a);
+---
+
+<PageLayout title="归档" description="所有文章按时间归档">
+  <div class="archive">
+    <div class="archive-summary">共 {allPosts.length} 篇</div>
+
+    {years.map((year) => (
+      <div class="archive-year">
+        <h2 class="archive-year-title">{year}</h2>
+        <ul class="archive-posts">
+          {postsByYear.get(year)?.map((post) => {
+            const date = post.data.date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
+            return (
+              <li class="archive-post">
+                <time class="archive-post-date">{date}</time>
+                <a href={`/posts/${post.data.abbrlink}.html`} class="archive-post-title">
+                  {post.data.title}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    ))}
+  </div>
+</PageLayout>

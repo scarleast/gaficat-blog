@@ -46,7 +46,7 @@ import { fluidThemeConfig } from '@gaficat/fluid-astro/config';
 ## Astro Integration
 
 Add the integration to the host project's `astro.config.mjs` to prepare Fluid
-config resolution and useful package aliases:
+config resolution, useful package aliases, and core blog routes:
 
 ```js
 // astro.config.mjs
@@ -58,6 +58,7 @@ export default defineConfig({
     fluidAstro({
       config: './fluid.config.yml',
       alias: '@fluid-astro',
+      routes: {},
     }),
   ],
 });
@@ -70,6 +71,37 @@ With that alias, host routes can import theme modules like this:
 import PostLayout from '@fluid-astro/layouts/PostLayout.astro';
 import { fluidThemeConfig } from '@fluid-astro/config';
 ---
+```
+
+The integration injects these routes by default:
+
+| key | pattern | entrypoint |
+| --- | --- | --- |
+| `home` | `/` | `routes/index.astro` |
+| `page` | `/page/[page].html` | `routes/page/[page].astro` |
+| `post` | `/posts/[abbrlink].html` | `routes/posts/[abbrlink].astro` |
+| `archives` | `/archives.html` | `routes/archives/index.astro` |
+| `categories` | `/categories.html` | `routes/categories/index.astro` |
+| `category` | `/categories/[...slug].html` | `routes/categories/[...slug].astro` |
+| `tags` | `/tags.html` | `routes/tags/index.astro` |
+| `tag` | `/tags/[tag].html` | `routes/tags/[tag].astro` |
+| `links` | `/links.html` | `routes/links/index.astro` |
+
+Disable all route injection when the host already owns its routes:
+
+```js
+fluidAstro({ routes: false });
+```
+
+Disable individual routes by key:
+
+```js
+fluidAstro({
+  routes: {
+    home: false,
+    post: false,
+  },
+});
 ```
 
 Use a host-owned config file by setting `FLUID_ASTRO_CONFIG` before running
@@ -89,9 +121,9 @@ If `FLUID_ASTRO_CONFIG` is not set, the loader checks:
 
 The host project must provide:
 
-- Astro routes under `src/pages/**`.
-- Content collections compatible with the layouts, typically `posts` and
-  optionally `pages`.
+- Content collections compatible with the injected routes, typically `posts`.
+- Host routes under `src/pages/**` only for pages the integration does not
+  inject or that the host wants to override.
 - Static assets referenced by config, such as `/img/upyun_logo8.svg` and
   `/img/police_beian.png`, or equivalent config overrides.
 - Markdown plugins needed by authored content, such as math and image-caption
@@ -128,7 +160,9 @@ const { Content, headings } = await post.render();
 {
   ".": "./config.mjs",
   "./config": "./config.mjs",
+  "./integration": "./integration.mjs",
   "./_config.yml": "./_config.yml",
+  "./routes/*": "./routes/*",
   "./layouts/BaseLayout.astro": "./layouts/BaseLayout.astro",
   "./layouts/PageLayout.astro": "./layouts/PageLayout.astro",
   "./layouts/PostLayout.astro": "./layouts/PostLayout.astro",
@@ -139,9 +173,10 @@ const { Content, headings } = await post.render();
 
 ## Current Limits
 
-- Route generation is not bundled as an Astro integration.
-- The current integration prepares config and aliases; it does not create
-  `src/pages/**` routes or content collections.
+- Route injection covers core blog pages, but not about/aboutme, RSS, or search
+  index routes yet.
+- The integration does not create `src/content.config.ts` or copy static assets
+  into the host project.
 - Post, category, and tag URLs currently follow this site's URL conventions.
 - Config is loaded at module evaluation time. Set `FLUID_ASTRO_CONFIG` before
   Astro imports theme modules, or use the integration `config` option.

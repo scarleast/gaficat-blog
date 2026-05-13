@@ -16,6 +16,7 @@
     "_config.yml",
     "config.mjs",
     "integration.mjs",
+    "routes",
     "layouts",
     "components",
     "assets/styles"
@@ -27,6 +28,7 @@
     "./integration": "./integration.mjs",
     "./integration.mjs": "./integration.mjs",
     "./_config.yml": "./_config.yml",
+    "./routes/*": "./routes/*",
     "./layouts/BaseLayout.astro": "./layouts/BaseLayout.astro",
     "./layouts/PageLayout.astro": "./layouts/PageLayout.astro",
     "./layouts/PostLayout.astro": "./layouts/PostLayout.astro",

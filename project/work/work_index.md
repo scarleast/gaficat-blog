@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0033 | 2026-05-13 | Inject Fluid Astro Blog Routes | `project/work/WI-0033/` |
 | WI-0032 | 2026-05-13 | Add Fluid Astro Integration Entrypoint | `project/work/WI-0032/` |
 | WI-0031 | 2026-05-13 | Package Fluid Astro Theme | `project/work/WI-0031/` |
 | WI-0030 | 2026-05-13 | Drive Fluid Astro Metadata From Theme Config | `project/work/WI-0030/` |

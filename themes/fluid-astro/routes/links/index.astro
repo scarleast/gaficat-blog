@@ -1,0 +1,41 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { fluidThemeConfig } from '../../config.mjs';
+
+const links = fluidThemeConfig.links.friends;
+const linkApplication = fluidThemeConfig.links.application;
+const applicationHref = `mailto:${linkApplication.email}?subject=${encodeURIComponent(linkApplication.subject)}&body=${encodeURIComponent(linkApplication.body)}`;
+---
+
+<PageLayout title={fluidThemeConfig.pages.links.title} description={fluidThemeConfig.pages.links.description}>
+  <div class="row links">
+      {links.map((link) => (
+      <div class="card col-lg-4 col-md-6 col-sm-12">
+        <a class="card-body hover-with-bg" href={link.url} target="_blank" rel="noopener">
+          <div class="card-content">
+            <div class="link-avatar my-auto">
+              <img src={link.avatar} alt={link.name} />
+            </div>
+            <div class="link-text">
+              <div class="link-title">{link.name}</div>
+              <div class="link-intro">{link.desc}</div>
+            </div>
+          </div>
+        </a>
+      </div>
+      ))}
+  </div>
+
+  <div class="custom mx-auto markdown-body">
+    <hr />
+    <p>
+      友链申请先添加我的网站，再给我邮件：<a href={applicationHref}>{linkApplication.email}</a>，按如下格式提供信息：
+    </p>
+    <ul>
+      <li>博客名：{linkApplication.blog_name}</li>
+      <li>简介：{linkApplication.description}</li>
+      <li>链接：{linkApplication.url}</li>
+      <li>icon：{linkApplication.icon}</li>
+    </ul>
+  </div>
+</PageLayout>
