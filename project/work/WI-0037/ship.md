@@ -2,7 +2,7 @@
 
 - work_id: WI-0037
 - stage: ship
-- status: pending
+- status: closed
 - owner: main-agent
 - updated_at: 2026-05-13
 
@@ -15,7 +15,9 @@
 
 ## Commit
 
-- commit: `d27bcbb` Split modern and legacy feed sitemap outputs
+- commits:
+  - `d27bcbb` Split modern and legacy feed sitemap outputs
+  - governance-only ship record updates are in the subsequent local git history.
 - push: not run because this repository has no configured remote.
 
 ## Follow-ups
