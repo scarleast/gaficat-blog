@@ -8,10 +8,12 @@
 | work_id | stage | owner | title | path |
 | --- | --- | --- | --- | --- |
 
+
 ## Closed Work
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0022 | 2026-05-13 | Clean Repository Layout | `project/work/WI-0022/` |
 | WI-0021 | 2026-05-12 | Introduce Hexo-Style Content And Fluid Astro Theme Boundary | `project/work/WI-0021/` |
 | WI-0020 | 2026-05-12 | Close Stale WI Delivery Metadata | `project/work/WI-0020/` |
 | WI-0019 | 2026-05-12 | Restore Post Prev Next Arrows | `project/work/WI-0019/` |

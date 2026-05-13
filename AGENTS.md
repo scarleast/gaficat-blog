@@ -57,6 +57,12 @@ Generated or dependency paths are not primary edit targets:
 - `node_modules/**`
 - `.astro/**`
 
+Local scratch and visual/debug captures are not source of truth:
+
+- `tmp/**`
+- root-level `*.png`
+- root-level `*-snapshot.txt`
+
 ## Control Plane
 
 Control-plane paths are governance and agent runtime files:

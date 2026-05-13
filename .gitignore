@@ -25,3 +25,7 @@ Thumbs.db
 
 # Temporary local work
 tmp/
+
+# Local visual/debug captures
+/*.png
+/*-snapshot.txt

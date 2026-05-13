@@ -37,11 +37,17 @@ There is currently no project script for lint, typecheck, or tests. If those are
 
 ## Content Rules
 
-Posts under `src/content/posts/**` are authored content. Preserve frontmatter fields and existing filename conventions unless the work item explicitly changes content structure.
+Posts under `source/_posts/**` are authored content. Preserve frontmatter fields and existing filename conventions unless the work item explicitly changes content structure.
+
+Theme-owned layouts, components, styles, and theme configuration belong under `themes/fluid-astro/**`. Route files under `src/pages/**` should compose the theme rather than duplicating theme implementation.
+
+Do not place visual/debug screenshots in the repository root. Put check evidence under the relevant `project/work/WI-XXXX/evidence/**` directory.
 
 ## Build Output
 
 Treat `dist/**` as generated output. Do not edit it directly during normal implementation. Regenerate it with `npm run build` when publish artifacts are needed.
+
+Treat `tmp/**`, `.astro/**`, `node_modules/**`, local OS files, and root-level visual/debug captures as local state. They are not source-of-truth inputs unless a work item explicitly imports them into `source/**`, `themes/**`, `public/**`, or WI evidence.
 
 ## Dependency Changes
 
