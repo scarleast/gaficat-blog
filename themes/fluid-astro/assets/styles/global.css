@@ -1445,11 +1445,15 @@ html[data-color-scheme="light"] .license-box {
   margin-left: -15px;
 }
 
-/* Column base */
+/* Column base — all column classes collapse to 100% below their breakpoint */
 .col-12,
 .col-sm-12,
 .col-md-6,
-.col-lg-4 {
+.col-md-10,
+.col-md-12,
+.col-lg-2,
+.col-lg-4,
+.col-lg-8 {
   flex: 0 0 100%;
   max-width: 100%;
   position: relative;
