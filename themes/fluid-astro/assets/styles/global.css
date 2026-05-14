@@ -2017,16 +2017,21 @@ html[data-color-scheme="light"] .audio-player-shell {
     word-break: break-all;
   }
 
-  /* CC icon: bottom-right, small, alongside license row */
+  /* CC icon: bottom-right, below license meta */
+  .license-box {
+    position: relative;
+    padding-bottom: 1.5rem;
+  }
+
   .license-box .license-icon {
     top: auto;
     bottom: 0.25rem;
     left: auto;
-    right: 0.5rem;
+    right: 0.75rem;
   }
 
   .license-box .license-icon::after {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     opacity: 0.5;
   }
 
