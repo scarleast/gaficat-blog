@@ -211,6 +211,7 @@
   padding: 1.45rem 1rem;
   white-space: pre !important;
   word-wrap: normal !important;
+  max-width: 100%;
 }
 
 .markdown-body pre code {

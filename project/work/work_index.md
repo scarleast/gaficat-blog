@@ -13,6 +13,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0042 | 2026-05-14 | Fix Mobile Responsive Layout Across All Pages | `project/work/WI-0042/` |
 | WI-0041 | 2026-05-14 | GitHub Actions CI/CD to Cloudflare Pages | `project/work/WI-0041/` |
 | WI-0040 | 2026-05-14 | Post Media Asset Integrity Check | `project/work/WI-0040/` |
 | WI-0039 | 2026-05-13 | Content Gap Analysis — Live Site vs Local Repo | `project/work/WI-0039/` |

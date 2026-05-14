@@ -336,6 +336,23 @@ html[data-color-scheme="light"] .header-transparent.navbar-scrolled {
   box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
 }
 
+@media (max-width: 767px) {
+  #board {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    border-radius: 0.375rem;
+    padding: 2rem 0;
+  }
+}
+
+@media (max-width: 424px) {
+  #board {
+    margin-left: 0.375rem;
+    margin-right: 0.375rem;
+    padding: 1.5rem 0;
+  }
+}
+
 /* ===== Flex center utility — matching halo-theme-fluid ===== */
 .flex-center {
   display: -webkit-box;
@@ -540,8 +557,8 @@ html[data-color-scheme="light"] .header-transparent.navbar-scrolled {
 
 @media (max-width: 767px) {
   .post-content {
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 }
 
@@ -1912,5 +1929,156 @@ html[data-color-scheme="light"] .audio-player-shell {
   .audio-player-progress {
     grid-row: 1;
     grid-column: 1 / -1;
+  }
+}
+
+/* ===== Mobile responsive fixes — WI-0042 ===== */
+
+/* Prevent all content from overflowing viewport */
+@media (max-width: 767px) {
+  /* Global overflow protection */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Container-fluid should have minimal padding on mobile */
+  .container-fluid.nopadding-x {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Board container — allow a little padding so board margin is visible */
+  #board-ctn.container.nopadding-x-md {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Ensure images never overflow */
+  .markdown-body img,
+  .markdown-body p > img,
+  .markdown-body figure > img,
+  .markdown-body p > a > img,
+  .markdown-body figure > a > img,
+  .markdown-body > div[style*="text-align:center"] > img,
+  .markdown-body > div[style*="text-align: center"] > img,
+  .markdown-body > center > img,
+  .prose img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Ensure post titles don't overflow */
+  .markdown-body h1 {
+    font-size: 1.5em;
+    word-break: break-word;
+  }
+
+  .markdown-body h2 {
+    font-size: 1.25em;
+    word-break: break-word;
+  }
+
+  .markdown-body h3 {
+    font-size: 1.1em;
+  }
+
+  /* Post title outside markdown-body */
+  .post-content > h1 {
+    font-size: 1.75rem;
+  }
+
+  /* License box better layout on mobile */
+  .license-box .license-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .license-box .license-meta .license-meta-item {
+    margin-right: 0;
+  }
+
+  /* Post prev/next nav — stack vertically on very small screens */
+  .post-prevnext {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .post-prevnext .post-prev,
+  .post-prevnext .post-next {
+    width: 100%;
+  }
+
+  .post-prevnext .post-next {
+    justify-content: flex-start;
+  }
+
+  /* Footer improvements */
+  .footer-inner {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Archive post items — date and title stack if needed */
+  .archive-post {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .archive-post-date {
+    min-width: auto;
+    font-size: 0.8rem;
+  }
+
+  /* Category list more touch-friendly */
+  .category-item {
+    padding: 0.875rem 0.75rem;
+  }
+
+  /* Links page cards full width */
+  .links .card {
+    min-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 424px) {
+  /* Extra-small screens — tighter spacing */
+  .post-metas {
+    font-size: 0.8rem;
+  }
+
+  .post-bottom-metas .post-meta {
+    font-size: 0.8rem;
+  }
+
+  /* Banner text even smaller */
+  .banner-text {
+    width: 90%;
+  }
+
+  .banner-text .h2 {
+    font-size: 1.5rem;
+  }
+
+  /* Pagination more compact */
+  .pagination .page-number,
+  .pagination .current,
+  .pagination .extend {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  /* Index cards tighter */
+  .index-header {
+    font-size: 1.1rem;
+  }
+
+  .index-header .index-pin {
+    font-size: 1.1rem;
+  }
+
+  .index-btm {
+    font-size: 0.8rem;
   }
 }
