@@ -2021,7 +2021,7 @@ html[data-color-scheme="light"] .audio-player-shell {
   /* CC icon: bottom-right corner, clear of all text */
   .license-box {
     position: relative;
-    padding-bottom: 2.5rem;
+    padding-bottom: 3.5rem;
   }
 
   .license-box .license-icon {
