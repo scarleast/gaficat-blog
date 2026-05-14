@@ -1999,6 +1999,16 @@ html[data-color-scheme="light"] .audio-player-shell {
 
   .license-box .license-meta .license-meta-item {
     margin-right: 0;
+    align-items: flex-start;
+  }
+
+  .license-box .license-meta .license-meta-item > div:nth-child(2) {
+    word-break: break-all;
+  }
+
+  /* Hide CC watermark icon on mobile — it overlaps content */
+  .license-box .license-icon::after {
+    display: none;
   }
 
   /* Post prev/next nav — stack vertically on very small screens */
@@ -2020,6 +2030,13 @@ html[data-color-scheme="light"] .audio-player-shell {
   .footer-inner {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+
+  /* Beian items stack vertically on mobile */
+  .footer-inner .beian {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
   }
 
   /* Archive post items — date and title stack if needed */
