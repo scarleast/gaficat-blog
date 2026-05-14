@@ -32,5 +32,8 @@ jobs:
       - name: Build site
         run: npm run build
 
+      - name: Create Cloudflare Pages project
+        run: npx wrangler pages project create gaficat-blog production || true
+
       - name: Deploy to Cloudflare Pages
         run: npx wrangler pages deploy dist --project-name gaficat-blog
