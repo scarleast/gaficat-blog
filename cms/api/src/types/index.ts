@@ -3,6 +3,7 @@ export interface Env {
   GITHUB_CLIENT_ID: string;
   GITHUB_CLIENT_SECRET: string;
   JWT_SECRET: string;
+  FRONTEND_URL: string;
 }
 
 export type AppType = { Bindings: Env; Variables: { userId: number; user: { id: number; github_id: number; username: string; avatar_url: string | null } } };

@@ -29,3 +29,4 @@ tmp/
 # Local visual/debug captures
 /*.png
 /*-snapshot.txt
+.dev.vars

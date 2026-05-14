@@ -23,7 +23,8 @@ auth.get('/github/callback', async (c) => {
   try {
     const { token, user } = await githubOAuth(code, c.env);
     // Redirect to frontend with token
-    return c.redirect(`/?token=${token}`);
+    const frontendUrl = c.env.FRONTEND_URL || new URL(c.req.url).origin;
+    return c.redirect(`${frontendUrl}/?token=${token}`);
   } catch (e) {
     return c.json({ error: (e as Error).message }, 400);
   }

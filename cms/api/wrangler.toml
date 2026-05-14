@@ -3,12 +3,12 @@ main = "src/index.ts"
 compatibility_date = "2024-12-01"
 
 [vars]
-GITHUB_CLIENT_ID = ""
+GITHUB_CLIENT_ID = "Ov23liwG2wH1Xe8dXm9u"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "gaficat-cms"
-database_id = ""
+database_id = "local-dev-placeholder"
 
 # Secrets (set via `wrangler secret put`):
 # - GITHUB_CLIENT_SECRET
