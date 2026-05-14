@@ -8,7 +8,7 @@ import rehypeKatex from 'rehype-katex';
 import rehypeImageCaptions from './src/utils/rehype-image-captions';
 import rehypeMediaShortcodes from './src/utils/rehype-media-shortcodes';
 import remarkMediaShortcodes from './src/utils/remark-media-shortcodes';
-import { writeLegacyRedirects, writeLegacySitemap } from './src/utils/legacy-sitemap-pages.mjs';
+import { writeLegacySitemap } from './src/utils/legacy-sitemap-pages.mjs';
 
 const site = 'https://www.gaficat.com';
 

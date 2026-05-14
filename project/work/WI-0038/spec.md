@@ -64,6 +64,12 @@
 - **部署域名**：cms.justmysec.com（CF Pages）
 - **frontmatter schema**：用户自定义配置（字段名、类型、是否必填），平台不预设
 - **构建状态反馈**：需要，轮询 GitHub Actions API 展示成功/失败/进行中状态
+- **构建触发方式**：使用 `repository_dispatch` webhook，支持 **保存 ≠ 发布** 的工作流
+  - 用户编辑内容 → 保存（commit 到 GitHub 仓库，不触发构建）
+  - 用户点击「发布」按钮 → CMS 调用 `POST /repos/{owner}/{repo}/dispatches` 触发构建
+  - 支持按 event_type 分流：`publish`（增量发布）、`rebuild-all`（全量重建）
+  - 用户仓库的 workflow 需配置 `on: repository_dispatch` + `workflow_dispatch` 接收触发
+  - 对比 `push + paths` 过滤：repository_dispatch 由用户控制发布节奏，而非每次 commit 自动上线，更适合 CMS 场景
 
 ## Exit Criteria
 
