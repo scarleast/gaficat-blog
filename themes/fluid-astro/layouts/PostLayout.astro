@@ -243,4 +243,32 @@ const bottomCategories = getCategories(categories);
   }
 
   initTyped();
+
+  // Image lightbox: click any image in post to view full-size
+  function initLightbox() {
+    const container = document.querySelector('.markdown-body');
+    if (!container) return;
+
+    container.querySelectorAll('img').forEach((img) => {
+      img.style.cursor = 'zoom-in';
+      img.addEventListener('click', () => {
+        const overlay = document.createElement('div');
+        overlay.className = 'lightbox-overlay';
+        const fullImg = document.createElement('img');
+        fullImg.src = img.src;
+        fullImg.alt = img.alt || '';
+        overlay.appendChild(fullImg);
+        document.body.appendChild(overlay);
+        document.body.style.overflow = 'hidden';
+
+        overlay.addEventListener('click', () => {
+          overlay.remove();
+          document.body.style.overflow = '';
+        });
+      });
+    });
+  }
+
+  initLightbox();
+  document.addEventListener('astro:page-load', initLightbox);
 </script>
