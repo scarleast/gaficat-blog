@@ -2018,15 +2018,20 @@ html[data-color-scheme="light"] .audio-player-shell {
     word-break: break-all;
   }
 
+  /* Push 许可协议 row down to align with CC icon center */
+  .license-box .license-meta .license-meta-item:nth-child(3) {
+    margin-top: 2.5rem;
+  }
+
   /* CC icon: bottom-right corner, clear of all text */
   .license-box {
     position: relative;
-    padding-bottom: 3.5rem;
+    padding-bottom: 1.25rem;
   }
 
   .license-box .license-icon {
     top: auto;
-    bottom: 0.375rem;
+    bottom: 0;
     left: auto;
     right: 0.75rem;
   }
