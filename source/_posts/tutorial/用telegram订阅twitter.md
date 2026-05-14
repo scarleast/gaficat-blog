@@ -63,7 +63,7 @@ IFTTT是一个自动化的平台，简单来说，你可以通过APP和网页，
 
 设置完触发条件后，会回到IFTTT创建自动化流程的总体页面，就可以添加我们自动化任务需要执行的任务了，点击`Then That`后的`Add`即可。
 
-![IFTTT Then That](https://pic.gaficat.com/default/IFTTT-THEN THAT.png)
+![IFTTT Then That](https://pic.gaficat.com/default/IFTTT-THEN%20THAT.png)
 
 因为我们希望执行的动作，是往telegram上推送内容，这里就可以直接搜索telegram，选定telegram，进行后续的配置。
 

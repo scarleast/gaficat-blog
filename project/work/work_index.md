@@ -1,17 +1,21 @@
 # Work Index
 
-- `active_work_count`: `0`
-- `current_stage_summary`: no active work
+- `active_work_count`: `1`
+- `current_stage_summary`: WI-0038 at /spec (paused)
 
 ## Active Work
 
 | work_id | stage | owner | title | path |
 | --- | --- | --- | --- | --- |
+| WI-0038 | spec | main-agent | Static Blog CMS Hosting Platform MVP | `project/work/WI-0038/` |
 
 ## Closed Work
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0041 | 2026-05-14 | GitHub Actions CI/CD to Cloudflare Pages | `project/work/WI-0041/` |
+| WI-0040 | 2026-05-14 | Post Media Asset Integrity Check | `project/work/WI-0040/` |
+| WI-0039 | 2026-05-13 | Content Gap Analysis — Live Site vs Local Repo | `project/work/WI-0039/` |
 | WI-0037 | 2026-05-13 | Split Modern And Legacy Feed Sitemap Outputs | `project/work/WI-0037/` |
 | WI-0036 | 2026-05-13 | Add Legacy Feed And HTML URL Compatibility | `project/work/WI-0036/` |
 | WI-0035 | 2026-05-13 | Normalize Canonical URLs, Sitemap, And Feed | `project/work/WI-0035/` |
