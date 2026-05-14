@@ -33,7 +33,7 @@ jobs:
         run: npm run build
 
       - name: Create Cloudflare Pages project
-        run: npx wrangler pages project create gaficat-blog || true
+        run: npx wrangler pages project create gaficat-blog --production-branch main || true
 
       - name: Deploy to Cloudflare Pages
         run: npx wrangler pages deploy dist --project-name gaficat-blog
