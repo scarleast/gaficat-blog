@@ -2,7 +2,12 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
-import { parseFrontmatter, buildFrontmatterYaml } from '@/lib/utils';
+
+function splitFrontmatter(content: string): { frontmatter: string; body: string } {
+  const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (!match) return { frontmatter: '---\n---', body: content };
+  return { frontmatter: `---\n${match[1]}\n---`, body: match[2] };
+}
 
 export function PostEditPage() {
   const { siteId } = useParams<{ siteId: string }>();
@@ -22,8 +27,8 @@ export function PostEditPage() {
     if (!siteId || !postPath) return;
     api.getPost(Number(siteId), postPath)
       .then((res) => {
-        const { frontmatter, body: b } = parseFrontmatter(res.post.content);
-        setFrontmatterText(buildFrontmatterYaml(frontmatter));
+        const { frontmatter, body: b } = splitFrontmatter(res.post.content);
+        setFrontmatterText(frontmatter);
         setBody(b);
         setSha(res.post.sha);
       })
