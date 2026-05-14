@@ -46,7 +46,6 @@ export default defineConfig({
       name: 'legacy-html-compatibility',
       hooks: {
         'astro:build:done': ({ dir }) => {
-          writeLegacyRedirects(dir, site);
           writeLegacySitemap(dir, site);
         },
       },
