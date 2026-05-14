@@ -55,10 +55,6 @@ export function getLegacyRedirects() {
     { legacyPath: '/links.html', canonicalPath: '/links' },
     { legacyPath: '/about.html', canonicalPath: '/about' },
     { legacyPath: '/aboutme.html', canonicalPath: '/aboutme' },
-    ...Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
-      const page = index + 2;
-      return { legacyPath: `/page/${page}.html`, canonicalPath: `/page/${page}` };
-    }),
     ...posts.map((post) => ({
       legacyPath: `/posts/${post.abbrlink}.html`,
       canonicalPath: `/posts/${post.abbrlink}`,
