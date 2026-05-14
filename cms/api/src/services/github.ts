@@ -1,22 +1,43 @@
 export async function listFiles(token: string, repo: string, path: string, branch: string): Promise<Array<{ name: string; path: string; sha: string; size: number; download_url: string | null }>> {
+  // Use Git Trees API for recursive listing (Contents API is flat-only)
   const res = await fetch(
-    `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}?ref=${branch}`,
-    { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' } }
+    `https://api.github.com/repos/${repo}/git/trees/${branch}:${encodeURIComponent(path)}?recursive=1`,
+    { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json', 'User-Agent': 'gaficat-cms' } }
   );
-  if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
-  const data = await res.json() as Array<{ name: string; path: string; sha: string; size: number; download_url: string | null }>;
-  return Array.isArray(data) ? data : [data];
+  if (!res.ok) {
+    // Fallback: try Contents API for flat directories
+    const fb = await fetch(
+      `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}?ref=${branch}`,
+      { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json', 'User-Agent': 'gaficat-cms' } }
+    );
+    if (!fb.ok) throw new Error(`GitHub API error: ${fb.status}`);
+    const data = await fb.json() as Array<{ name: string; path: string; sha: string; size: number; download_url: string | null }>;
+    return Array.isArray(data) ? data : [data];
+  }
+  const data = await res.json<{ tree: Array<{ path: string; sha: string; size: number; type: string }> }>();
+  return data.tree
+    .filter((item) => item.type === 'blob')
+    .map((item) => ({
+      name: item.path.split('/').pop() || item.path,
+      path: item.path,
+      sha: item.sha,
+      size: item.size,
+      download_url: null,
+    }));
 }
 
 export async function getFile(token: string, repo: string, path: string, branch: string): Promise<{ content: string; sha: string }> {
   const res = await fetch(
     `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}?ref=${branch}`,
-    { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' } }
+    { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json', 'User-Agent': 'gaficat-cms' } }
   );
   if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
   const data = await res.json<{ content: string; sha: string; encoding: string }>();
+  const raw = data.encoding === 'base64'
+    ? new TextDecoder().decode(Uint8Array.from(atob(data.content.replace(/\n/g, '')), (c) => c.charCodeAt(0)))
+    : data.content;
   return {
-    content: data.encoding === 'base64' ? atob(data.content.replace(/\n/g, '')) : data.content,
+    content: raw,
     sha: data.sha,
   };
 }
@@ -33,13 +54,16 @@ export async function putFile(token: string, repo: string, path: string, content
     `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}`,
     {
       method: 'PUT',
-      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' },
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json', 'User-Agent': 'gaficat-cms' },
       body: JSON.stringify(body),
     }
   );
   if (!res.ok) {
-    const err = await res.json() as { message?: string };
-    throw new Error(err.message || `GitHub API error: ${res.status}`);
+    const errText = await res.text();
+    console.log('[DEBUG] putFile GitHub error:', res.status, errText.slice(0, 300));
+    let errMsg = `GitHub API error: ${res.status}`;
+    try { errMsg = JSON.parse(errText).message || errMsg; } catch {}
+    throw new Error(errMsg);
   }
   return res.json();
 }
@@ -49,7 +73,7 @@ export async function deleteFile(token: string, repo: string, path: string, bran
     `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}`,
     {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' },
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json', 'User-Agent': 'gaficat-cms' },
       body: JSON.stringify({ message: `CMS: delete ${path}`, sha, branch }),
     }
   );
@@ -61,7 +85,7 @@ export async function triggerDispatch(token: string, repo: string, eventType: st
     `https://api.github.com/repos/${repo}/dispatches`,
     {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' },
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json', 'User-Agent': 'gaficat-cms' },
       body: JSON.stringify({ event_type: eventType }),
     }
   );
@@ -71,7 +95,7 @@ export async function triggerDispatch(token: string, repo: string, eventType: st
 export async function listWorkflowRuns(token: string, repo: string): Promise<Array<{ id: number; status: string; conclusion: string | null; created_at: string; updated_at: string }>> {
   const res = await fetch(
     `https://api.github.com/repos/${repo}/actions/runs?per_page=10`,
-    { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' } }
+    { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json', 'User-Agent': 'gaficat-cms' } }
   );
   if (!res.ok) return [];
   const data = await res.json<{ workflow_runs: Array<{ id: number; status: string; conclusion: string | null; created_at: string; updated_at: string }> }>();

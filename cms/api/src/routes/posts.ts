@@ -47,7 +47,8 @@ posts.get('/:path{.+}', async (c) => {
   if (!token) return c.json({ error: 'No token' }, 401);
 
   try {
-    const file = await github.getFile(token, site.repo_full_name, path, site.branch);
+    const fullPath = `${site.content_dir}/${path}`;
+    const file = await github.getFile(token, site.repo_full_name, fullPath, site.branch);
     return c.json({ post: { name: path.split('/').pop(), path, sha: file.sha, content: file.content } });
   } catch (e) {
     return c.json({ error: (e as Error).message }, 400);
@@ -66,7 +67,9 @@ posts.put('/:path{.+}', async (c) => {
 
   const body = await c.req.json<{ content: string; sha?: string }>();
   try {
-    const result = await github.putFile(token, site.repo_full_name, path, body.content, site.branch, body.sha);
+    const fullPath = `${site.content_dir}/${path}`;
+    console.log('[DEBUG] putFile:', site.repo_full_name, fullPath, 'branch:', site.branch, 'sha:', body.sha?.slice(0, 8));
+    const result = await github.putFile(token, site.repo_full_name, fullPath, body.content, site.branch, body.sha);
     return c.json({ post: { name: path.split('/').pop(), path, sha: result.content.sha, content: body.content } });
   } catch (e) {
     return c.json({ error: (e as Error).message }, 400);
@@ -85,7 +88,8 @@ posts.delete('/:path{.+}', async (c) => {
 
   const body = await c.req.json<{ sha: string }>();
   try {
-    await github.deleteFile(token, site.repo_full_name, path, site.branch, body.sha);
+    const fullPath = `${site.content_dir}/${path}`;
+    await github.deleteFile(token, site.repo_full_name, fullPath, site.branch, body.sha);
     return c.json({ success: true });
   } catch (e) {
     return c.json({ error: (e as Error).message }, 400);
