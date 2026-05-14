@@ -1,18 +1,18 @@
 # Work Index
 
-- `active_work_count`: `1`
-- `current_stage_summary`: WI-0038 at /spec (paused)
+- `active_work_count`: `0`
+- `current_stage_summary`: no active work
 
 ## Active Work
 
 | work_id | stage | owner | title | path |
 | --- | --- | --- | --- | --- |
-| WI-0038 | spec | main-agent | Static Blog CMS Hosting Platform MVP | `project/work/WI-0038/` |
 
 ## Closed Work
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0038 | 2026-05-14 | Static Blog CMS Hosting Platform MVP | `project/work/WI-0038/` |
 | WI-0042 | 2026-05-14 | Fix Mobile Responsive Layout Across All Pages | `project/work/WI-0042/` |
 | WI-0041 | 2026-05-14 | GitHub Actions CI/CD to Cloudflare Pages | `project/work/WI-0041/` |
 | WI-0040 | 2026-05-14 | Post Media Asset Integrity Check | `project/work/WI-0040/` |
