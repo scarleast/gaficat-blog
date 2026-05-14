@@ -1,22 +1,37 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import type { Site } from '@/types';
+
+interface GitHubRepo {
+  full_name: string;
+  name: string;
+  private: boolean;
+  default_branch: string;
+  description: string | null;
+  html_url: string;
+}
 
 export function SitesPage() {
   const { t } = useTranslation();
   const [sites, setSites] = useState<Site[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [repos, setRepos] = useState<GitHubRepo[]>([]);
+  const [reposLoading, setReposLoading] = useState(false);
+  const [repoSearch, setRepoSearch] = useState('');
+  const [repoDropdownOpen, setRepoDropdownOpen] = useState(false);
+  const repoDropdownRef = useRef<HTMLDivElement>(null);
+
   const [form, setForm] = useState({
     name: '',
     repo_full_name: '',
     branch: 'main',
-    content_dir: 'src/content/posts',
-    media_dir: 'src/assets/media',
+    content_dir: 'src/content/blog/posts',
+    media_dir: 'src/content/blog/posts',
     framework: 'astro',
-    build_command: 'npm run build',
-    output_dir: 'dist',
+    build_command: '',
+    output_dir: '',
   });
 
   const loadSites = () => {
@@ -26,13 +41,55 @@ export function SitesPage() {
       .finally(() => setLoading(false));
   };
 
+  const loadRepos = () => {
+    setReposLoading(true);
+    fetch('/api/repos', {
+      headers: { Authorization: `Bearer ${api.getToken()}` },
+    })
+      .then((res) => res.json<{ repos: GitHubRepo[] }>())
+      .then((data) => setRepos(data.repos || []))
+      .catch(() => setRepos([]))
+      .finally(() => setReposLoading(false));
+  };
+
   useEffect(loadSites, []);
+
+  useEffect(() => {
+    if (showForm && repos.length === 0) loadRepos();
+  }, [showForm]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (repoDropdownRef.current && !repoDropdownRef.current.contains(e.target as Node)) {
+        setRepoDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleSelectRepo = (repo: GitHubRepo) => {
+    setForm({
+      ...form,
+      repo_full_name: repo.full_name,
+      branch: repo.default_branch,
+      name: form.name || repo.name,
+    });
+    setRepoSearch(repo.full_name);
+    setRepoDropdownOpen(false);
+  };
+
+  const filteredRepos = repos.filter((r) =>
+    r.full_name.toLowerCase().includes(repoSearch.toLowerCase())
+  );
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     await api.createSite(form);
     setShowForm(false);
-    setForm({ name: '', repo_full_name: '', branch: 'main', content_dir: 'src/content/posts', media_dir: 'src/assets/media', framework: 'astro', build_command: 'npm run build', output_dir: 'dist' });
+    setForm({ name: '', repo_full_name: '', branch: 'main', content_dir: 'source/_posts', media_dir: 'source/_posts', framework: 'astro', build_command: '', output_dir: '' });
+    setRepoSearch('');
     loadSites();
   };
 
@@ -61,10 +118,45 @@ export function SitesPage() {
               <label className="block text-sm font-medium mb-1">{t('sites.name')}</label>
               <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} required placeholder={t('sites.namePlaceholder')} className="w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-3 py-2 text-sm" />
             </div>
-            <div>
+
+            {/* Repo selector with search dropdown */}
+            <div className="relative" ref={repoDropdownRef}>
               <label className="block text-sm font-medium mb-1">{t('sites.repo')}</label>
-              <input value={form.repo_full_name} onChange={(e) => setForm({...form, repo_full_name: e.target.value})} required placeholder={t('sites.repoPlaceholder')} className="w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-3 py-2 text-sm" />
+              <input
+                value={repoSearch}
+                onChange={(e) => {
+                  setRepoSearch(e.target.value);
+                  setRepoDropdownOpen(true);
+                  setForm({...form, repo_full_name: e.target.value});
+                }}
+                onFocus={() => setRepoDropdownOpen(true)}
+                required
+                placeholder={reposLoading ? t('common.loading') : t('sites.repoPlaceholder')}
+                disabled={reposLoading}
+                className="w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-3 py-2 text-sm"
+              />
+              {repoDropdownOpen && filteredRepos.length > 0 && (
+                <div className="absolute z-10 mt-1 w-full max-h-60 overflow-auto rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-lg">
+                  {filteredRepos.map((repo) => (
+                    <button
+                      key={repo.full_name}
+                      type="button"
+                      onClick={() => handleSelectRepo(repo)}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-[hsl(var(--accent))] flex items-center justify-between"
+                    >
+                      <span className="truncate">
+                        <span className="font-medium">{repo.full_name}</span>
+                        {repo.private && <span className="ml-1 text-xs text-[hsl(var(--muted-foreground))]">(private)</span>}
+                      </span>
+                      {repo.description && (
+                        <span className="ml-2 text-xs text-[hsl(var(--muted-foreground))] truncate max-w-[40%]">{repo.description}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+
             <div>
               <label className="block text-sm font-medium mb-1">{t('sites.branch')}</label>
               <input value={form.branch} onChange={(e) => setForm({...form, branch: e.target.value})} className="w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-3 py-2 text-sm" />
@@ -82,10 +174,6 @@ export function SitesPage() {
             <div>
               <label className="block text-sm font-medium mb-1">{t('sites.contentDir')}</label>
               <input value={form.content_dir} onChange={(e) => setForm({...form, content_dir: e.target.value})} className="w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-3 py-2 text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('sites.buildCommand')}</label>
-              <input value={form.build_command} onChange={(e) => setForm({...form, build_command: e.target.value})} className="w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-3 py-2 text-sm" />
             </div>
           </div>
           <button type="submit" className="rounded-md bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] hover:opacity-90">

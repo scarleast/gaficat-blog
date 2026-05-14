@@ -33,21 +33,36 @@ export async function githubOAuth(code: string, env: Env): Promise<{ token: stri
   // Exchange code for access token
   const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'User-Agent': 'gaficat-cms' },
     body: JSON.stringify({
       client_id: env.GITHUB_CLIENT_ID,
       client_secret: env.GITHUB_CLIENT_SECRET,
       code,
     }),
   });
-  const tokenData = await tokenRes.json<{ access_token: string }>();
-  if (!tokenData.access_token) throw new Error('GitHub OAuth failed');
+  const tokenText = await tokenRes.text();
+  console.log('[DEBUG] GitHub token response status:', tokenRes.status, 'body:', tokenText.slice(0, 300));
+  let tokenData: { access_token?: string; error?: string; error_description?: string };
+  try {
+    tokenData = JSON.parse(tokenText);
+  } catch {
+    throw new Error(`GitHub token exchange returned non-JSON (${tokenRes.status}): ${tokenText.slice(0, 200)}`);
+  }
+  if (!tokenData.access_token) throw new Error(`GitHub OAuth failed: ${tokenData.error || 'no access_token'} — ${tokenData.error_description || tokenText.slice(0, 200)}`);
 
   // Get user info
   const userRes = await fetch('https://api.github.com/user', {
-    headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    headers: { Authorization: `Bearer ${tokenData.access_token}`, 'User-Agent': 'gaficat-cms' },
   });
-  const ghUser = await userRes.json<{ id: number; login: string; avatar_url: string }>();
+  const userText = await userRes.text();
+  console.log('[DEBUG] GitHub user response status:', userRes.status, 'body:', userText.slice(0, 300));
+  let ghUser: { id: number; login: string; avatar_url: string };
+  try {
+    ghUser = JSON.parse(userText);
+  } catch {
+    throw new Error(`GitHub user API returned non-JSON (${userRes.status}): ${userText.slice(0, 200)}`);
+  }
+  if (!ghUser.id) throw new Error(`GitHub user API error: ${userText.slice(0, 200)}`);
 
   // Upsert user
   const existing = await env.DB.prepare('SELECT * FROM users WHERE github_id = ?')

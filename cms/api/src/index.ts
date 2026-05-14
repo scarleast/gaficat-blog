@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { AppType } from './types';
 import auth from './routes/auth';
+import repos from './routes/repos';
 import sites from './routes/sites';
 import posts from './routes/posts';
 import media from './routes/media';
@@ -18,6 +19,7 @@ app.use('/api/*', cors({
 app.get('/', (c) => c.json({ name: 'Gaficat CMS API', version: '0.1.0' }));
 
 app.route('/api/auth', auth);
+app.route('/api/repos', repos);
 app.route('/api/sites', sites);
 app.route('/api/sites/:siteId/posts', posts);
 app.route('/api/sites/:siteId/media', media);

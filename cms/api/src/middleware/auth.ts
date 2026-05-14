@@ -23,7 +23,9 @@ export async function authMiddleware(c: Context<AppType>, next: Next) {
     );
 
     const headerPayload = token.substring(0, token.lastIndexOf('.'));
-    const signature = Uint8Array.from(atob(parts[2]), (c) => c.charCodeAt(0));
+    // JWT uses URL-safe base64; atob() requires standard base64
+    const b64Sig = parts[2].replace(/-/g, '+').replace(/_/g, '/');
+    const signature = Uint8Array.from(atob(b64Sig), (c) => c.charCodeAt(0));
 
     const valid = await crypto.subtle.verify(
       'HMAC',
@@ -34,7 +36,7 @@ export async function authMiddleware(c: Context<AppType>, next: Next) {
 
     if (!valid) throw new Error('Invalid signature');
 
-    const payload = JSON.parse(atob(parts[1]));
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
     if (payload.exp && payload.exp < Date.now() / 1000) {
       return c.json({ error: 'Token expired' }, 401);
     }
