@@ -7,6 +7,7 @@ import sites from './routes/sites';
 import posts from './routes/posts';
 import media from './routes/media';
 import builds from './routes/builds';
+import commits from './routes/commits';
 
 const app = new Hono<AppType>();
 
@@ -24,5 +25,6 @@ app.route('/api/sites', sites);
 app.route('/api/sites/:siteId/posts', posts);
 app.route('/api/sites/:siteId/media', media);
 app.route('/api/sites/:siteId/builds', builds);
+app.route('/api/sites/:siteId/commits', commits);
 
 export default app;

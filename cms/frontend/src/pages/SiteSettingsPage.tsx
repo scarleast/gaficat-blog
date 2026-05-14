@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import type { Site } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { FileText, Settings, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function SiteSettingsPage() {
   const { siteId } = useParams<{ siteId: string }>();
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [site, setSite] = useState<Site | null>(null);
   const [form, setForm] = useState<Partial<Site>>({});
@@ -18,7 +22,11 @@ export function SiteSettingsPage() {
       .catch(() => navigate('/'));
   }, [siteId]);
 
-  if (!site) return <div className="text-center py-12 text-[hsl(var(--muted-foreground))]">{t('common.loading')}</div>;
+  if (!site) return (
+    <div className="flex items-center justify-center py-20">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[hsl(var(--primary))]" />
+    </div>
+  );
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,41 +34,55 @@ export function SiteSettingsPage() {
     navigate('/');
   };
 
-  const fields: { key: keyof Site; label: string; type?: string }[] = [
-    { key: 'name', label: t('sites.name') },
-    { key: 'repo_full_name', label: t('sites.repo') },
-    { key: 'branch', label: t('sites.branch') },
-    { key: 'content_dir', label: t('sites.contentDir') },
-    { key: 'media_dir', label: t('sites.mediaDir') },
-    { key: 'framework', label: t('sites.framework') },
-    { key: 'build_command', label: t('sites.buildCommand') },
-    { key: 'output_dir', label: t('sites.outputDir') },
+  const fields: { key: keyof Site; label: string }[] = [
+    { key: 'name', label: '站点名称' },
+    { key: 'repo_full_name', label: 'GitHub 仓库' },
+    { key: 'branch', label: '分支' },
+    { key: 'content_dir', label: '内容目录' },
+    { key: 'media_dir', label: '媒体目录' },
+    { key: 'framework', label: '框架' },
   ];
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="text-2xl font-bold text-[hsl(var(--foreground))] mb-6">{t('sites.settings')}</h1>
-      <form onSubmit={handleSave} className="space-y-4 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6">
-        {fields.map(({ key, label, type }) => (
-          <div key={key}>
-            <label className="block text-sm font-medium mb-1">{label}</label>
-            <input
-              value={(form[key] as string) ?? ''}
-              onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-              type={type}
-              className="w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-3 py-2 text-sm"
-            />
-          </div>
-        ))}
-        <div className="flex gap-3 pt-2">
-          <button type="submit" className="rounded-md bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] hover:opacity-90">
-            {t('sites.save')}
-          </button>
-          <button type="button" onClick={() => navigate(-1)} className="rounded-md border border-[hsl(var(--input))] px-4 py-2 text-sm hover:bg-[hsl(var(--accent))]">
-            {t('sites.cancel')}
-          </button>
-        </div>
-      </form>
+    <div className="space-y-6">
+      {/* Sub-navigation */}
+      <div className="flex gap-1 border-b border-[hsl(var(--border))]">
+        <Link to={`/sites/${siteId}/posts`} className="px-4 py-2.5 text-sm border-b-2 border-transparent text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+          <FileText className="h-4 w-4 inline mr-1" />文章
+        </Link>
+        <Link to={`/sites/${siteId}/builds`} className="px-4 py-2.5 text-sm border-b-2 border-transparent text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+          构建
+        </Link>
+        <Link to={`/sites/${siteId}/settings`} className="px-4 py-2.5 text-sm border-b-2 border-[hsl(var(--primary))] text-[hsl(var(--foreground))] font-medium">
+          <Settings className="h-4 w-4 inline mr-1" />设置
+        </Link>
+      </div>
+
+      <div className="max-w-2xl">
+        <Card>
+          <CardHeader>
+            <CardTitle>站点设置</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSave} className="space-y-4">
+              {fields.map(({ key, label }) => (
+                <div key={key}>
+                  <label className="block text-sm font-medium mb-1.5">{label}</label>
+                  <Input
+                    value={(form[key] as string) ?? ''}
+                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                  />
+                </div>
+              ))}
+              <Separator />
+              <div className="flex gap-3">
+                <Button type="submit">保存</Button>
+                <Button type="button" variant="outline" onClick={() => navigate(-1)}>取消</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

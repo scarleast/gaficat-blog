@@ -2,17 +2,38 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  LayoutDashboard,
+  Globe,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  Sun,
+  Moon,
+} from 'lucide-react';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const location = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(() =>
+    document.documentElement.classList.contains('dark')
+  );
+
+  const toggleDark = () => {
+    const next = !darkMode;
+    setDarkMode(next);
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('cms-theme', next ? 'dark' : 'light');
+  };
 
   const navItems = [
-    { path: '/', label: t('nav.dashboard') },
-    { path: '/sites', label: t('nav.sites') },
-    { path: '/settings', label: t('nav.settings') },
+    { path: '/', label: '仪表盘', icon: LayoutDashboard },
+    { path: '/sites', label: '站点管理', icon: Globe },
+    { path: '/settings', label: '设置', icon: Settings },
   ];
 
   const isActive = (path: string) => {
@@ -21,107 +42,114 @@ export function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--background))]">
-      {/* Top nav */}
-      <header className="sticky top-0 z-50 border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-sm">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
-          <div className="flex items-center gap-6">
-            <Link to="/" className="text-lg font-semibold text-[hsl(var(--foreground))]">
-              {t('app.title')}
+    <div className="flex min-h-screen bg-[hsl(var(--background))]">
+      {/* Sidebar - desktop */}
+      <aside className="hidden lg:flex lg:flex-col lg:w-60 border-r border-[hsl(var(--border))] bg-[hsl(var(--card))]">
+        <div className="flex items-center gap-2 px-4 h-14 border-b border-[hsl(var(--border))]">
+          <div className="w-8 h-8 rounded-lg bg-[hsl(var(--primary))] flex items-center justify-center text-[hsl(var(--primary-foreground))] font-bold text-sm">
+            C
+          </div>
+          <span className="font-semibold text-[hsl(var(--foreground))]">CMS</span>
+        </div>
+        <nav className="flex-1 p-3 space-y-1">
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                isActive(item.path)
+                  ? 'bg-[hsl(var(--accent))] text-[hsl(var(--foreground))] font-medium'
+                  : 'text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--foreground))]'
+              }`}
+            >
+              <item.icon className="h-4 w-4" />
+              {item.label}
             </Link>
-            <nav className="hidden md:flex items-center gap-1">
+          ))}
+        </nav>
+        <div className="p-3 border-t border-[hsl(var(--border))]">
+          <div className="flex items-center gap-2 mb-2">
+            {user?.avatar_url && (
+              <img src={user.avatar_url} alt="" className="h-8 w-8 rounded-full" />
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-[hsl(var(--foreground))] truncate">{user?.username}</p>
+            </div>
+          </div>
+          <div className="flex gap-1">
+            <Button variant="ghost" size="icon" onClick={toggleDark} className="h-8 w-8">
+              {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+            <select
+              value={i18n.language}
+              onChange={(e) => i18n.changeLanguage(e.target.value)}
+              className="h-8 rounded-md border border-[hsl(var(--input))] bg-transparent px-1 text-xs"
+            >
+              <option value="zh-CN">中文</option>
+              <option value="en">EN</option>
+            </select>
+            <Button variant="ghost" size="icon" onClick={logout} className="h-8 w-8 ml-auto">
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
+          <aside className="fixed left-0 top-0 bottom-0 w-60 bg-[hsl(var(--card))] border-r border-[hsl(var(--border))] z-50">
+            <div className="flex items-center justify-between px-4 h-14 border-b border-[hsl(var(--border))]">
+              <span className="font-semibold">CMS</span>
+              <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <nav className="p-3 space-y-1">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`px-3 py-2 rounded-md text-sm transition-colors ${
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                     isActive(item.path)
-                      ? 'bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))]'
-                      : 'text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]'
+                      ? 'bg-[hsl(var(--accent))] text-[hsl(var(--foreground))] font-medium'
+                      : 'text-[hsl(var(--muted-foreground))]'
                   }`}
                 >
+                  <item.icon className="h-4 w-4" />
                   {item.label}
                 </Link>
               ))}
             </nav>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Language switcher */}
-            <select
-              value={i18n.language}
-              onChange={(e) => i18n.changeLanguage(e.target.value)}
-              className="h-8 rounded-md border border-[hsl(var(--input))] bg-transparent px-2 text-sm"
-            >
-              <option value="zh-CN">中文</option>
-              <option value="en">English</option>
-            </select>
-
-            {/* User menu */}
-            <div className="hidden md:flex items-center gap-2">
-              {user?.avatar_url && (
-                <img src={user.avatar_url} alt="" className="h-7 w-7 rounded-full" />
-              )}
-              <span className="text-sm text-[hsl(var(--muted-foreground))]">{user?.username}</span>
-              <button
-                onClick={logout}
-                className="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
-              >
-                {t('nav.logout')}
-              </button>
-            </div>
-
-            {/* Mobile hamburger */}
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 rounded-md hover:bg-[hsl(var(--accent))]"
-              aria-label="Menu"
-            >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                {menuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-          </div>
+          </aside>
         </div>
+      )}
 
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="md:hidden border-t border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 pb-3">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setMenuOpen(false)}
-                className={`block px-3 py-2 rounded-md text-sm ${
-                  isActive(item.path)
-                    ? 'bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))]'
-                    : 'text-[hsl(var(--muted-foreground))]'
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-            <div className="mt-2 pt-2 border-t border-[hsl(var(--border))]">
-              <span className="text-sm text-[hsl(var(--muted-foreground))]">{user?.username}</span>
-              <button
-                onClick={() => { logout(); setMenuOpen(false); }}
-                className="ml-3 text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
-              >
-                {t('nav.logout')}
-              </button>
-            </div>
+      {/* Main area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top bar - mobile */}
+        <header className="lg:hidden sticky top-0 z-30 flex items-center gap-3 h-14 px-4 border-b border-[hsl(var(--border))] bg-[hsl(var(--card))]">
+          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
+            <Menu className="h-5 w-5" />
+          </Button>
+          <span className="font-semibold">CMS</span>
+          <div className="ml-auto flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={toggleDark} className="h-8 w-8">
+              {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+            {user?.avatar_url && <img src={user.avatar_url} alt="" className="h-7 w-7 rounded-full" />}
           </div>
-        )}
-      </header>
+        </header>
 
-      {/* Main content */}
-      <main className="mx-auto max-w-7xl px-4 py-6">
-        {children}
-      </main>
+        {/* Page content */}
+        <main className="flex-1 overflow-auto">
+          <div className="mx-auto max-w-6xl px-4 lg:px-8 py-6">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

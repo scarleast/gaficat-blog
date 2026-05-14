@@ -7,7 +7,6 @@ import { SitesPage } from '@/pages/SitesPage';
 import { SiteSettingsPage } from '@/pages/SiteSettingsPage';
 import { PostsPage } from '@/pages/PostsPage';
 import { PostEditPage } from '@/pages/PostEditPage';
-import { MediaPage } from '@/pages/MediaPage';
 import { BuildsPage } from '@/pages/BuildsPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 
@@ -17,7 +16,7 @@ function ProtectedRoutes() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[hsl(var(--primary))]" />
       </div>
     );
   }
@@ -34,7 +33,6 @@ function ProtectedRoutes() {
         <Route path="/sites/:siteId/settings" element={<SiteSettingsPage />} />
         <Route path="/sites/:siteId/posts" element={<PostsPage />} />
         <Route path="/sites/:siteId/posts/edit" element={<PostEditPage />} />
-        <Route path="/sites/:siteId/media" element={<MediaPage />} />
         <Route path="/sites/:siteId/builds" element={<BuildsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
