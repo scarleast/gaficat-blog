@@ -1,19 +1,9 @@
 name: Deploy to Cloudflare Pages
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'src/**'
-      - 'source/**'
-      - 'public/**'
-      - 'themes/**'
-      - 'astro.config.mjs'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'tsconfig.json'
-      - '.github/workflows/deploy.yml'
+  repository_dispatch:
+    types:
+      - cms-deploy
   workflow_dispatch:
 
 jobs:

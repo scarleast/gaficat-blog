@@ -12,6 +12,7 @@
 
 | work_id | closed_at | title | path |
 | --- | --- | --- | --- |
+| WI-0045 | 2026-05-15 | CMS UX Polish, Branding & CI/CD Control | `project/work/WI-0045/` |
 | WI-0044 | 2026-05-14 | CMS Frontend Modernization with shadcn UI | `project/work/WI-0044/` |
 | WI-0043 | 2026-05-14 | Fix CMS Save/Publish Frontmatter Corruption | `project/work/WI-0043/` |
 | WI-0038 | 2026-05-14 | Static Blog CMS Hosting Platform MVP | `project/work/WI-0038/` |

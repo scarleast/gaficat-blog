@@ -1,31 +1,148 @@
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
+import { useState } from 'react';
+import {
+  GitBranch,
+  FileText,
+  Zap,
+  Globe,
+  ArrowRight,
+  Sun,
+  Moon,
+  Github,
+} from 'lucide-react';
+
+const features = [
+  {
+    key: 'git',
+    icon: GitBranch,
+  },
+  {
+    key: 'markdown',
+    icon: FileText,
+  },
+  {
+    key: 'deploy',
+    icon: Zap,
+  },
+  {
+    key: 'framework',
+    icon: Globe,
+  },
+];
 
 export function LoginPage() {
   const { t } = useTranslation();
   const { login } = useAuth();
+  const [darkMode, setDarkMode] = useState(() =>
+    document.documentElement.classList.contains('dark')
+  );
+
+  const toggleDark = () => {
+    const next = !darkMode;
+    setDarkMode(next);
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('cms-theme', next ? 'dark' : 'light');
+  };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[hsl(var(--background))]">
-      <div className="w-full max-w-sm mx-auto px-4">
-        <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-8 shadow-sm">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">{t('app.title')}</h1>
-            <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">
-              {t('auth.loginDescription')}
-            </p>
+    <div className="min-h-screen bg-[hsl(var(--background))] flex flex-col">
+      {/* Nav */}
+      <nav className="flex items-center justify-between px-6 h-16 border-b border-[hsl(var(--border))]">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+            A
           </div>
+          <span className="text-lg font-bold text-[hsl(var(--foreground))] tracking-tight">AnyoneCMS</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleDark}
+            className="h-8 w-8 rounded-md flex items-center justify-center text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] hover:bg-[hsl(var(--accent))] transition-colors"
+          >
+            {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
           <button
             onClick={login}
-            className="w-full flex items-center justify-center gap-3 rounded-md bg-[hsl(var(--primary))] px-4 py-2.5 text-sm font-medium text-[hsl(var(--primary-foreground))] hover:opacity-90 transition-opacity"
+            className="hidden sm:flex items-center gap-2 text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors"
           >
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>
-            {t('auth.loginWithGitHub')}
+            {t('auth.login')}
+            <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
-      </div>
+      </nav>
+
+      {/* Hero */}
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-16">
+        <div className="max-w-2xl text-center space-y-8">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full border border-[hsl(var(--border))] px-3.5 py-1 text-xs text-[hsl(var(--muted-foreground))]">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            {t('landing.badge')}
+          </div>
+
+          {/* Title */}
+          <h1 className="text-4xl sm:text-5xl font-bold text-[hsl(var(--foreground))] tracking-tight leading-tight">
+            {t('landing.title')}{' '}
+            <span className="bg-gradient-to-r from-violet-500 to-indigo-500 bg-clip-text text-transparent">
+              {t('landing.titleHighlight')}
+            </span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className="text-lg text-[hsl(var(--muted-foreground))] max-w-lg mx-auto leading-relaxed">
+            {t('landing.subtitle')}
+          </p>
+
+          {/* CTA */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <button
+              onClick={login}
+              className="w-full sm:w-auto flex items-center justify-center gap-2.5 rounded-lg bg-[hsl(var(--foreground))] px-6 py-3 text-sm font-medium text-[hsl(var(--background))] hover:opacity-90 transition-opacity"
+            >
+              <Github className="h-5 w-5" />
+              {t('auth.loginWithGitHub')}
+            </button>
+            <a
+              href="https://github.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg border border-[hsl(var(--border))] px-6 py-3 text-sm font-medium text-[hsl(var(--foreground))] hover:bg-[hsl(var(--accent))] transition-colors"
+            >
+              {t('landing.learnMore')}
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+
+        {/* Features */}
+        <div className="max-w-3xl w-full mt-20 grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {features.map(({ key, icon: Icon }) => (
+            <div
+              key={key}
+              className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 text-center space-y-2"
+            >
+              <div className="mx-auto w-9 h-9 rounded-md bg-[hsl(var(--accent))] flex items-center justify-center">
+                <Icon className="h-4.5 w-4.5 text-[hsl(var(--foreground))]" />
+              </div>
+              <h3 className="text-sm font-medium text-[hsl(var(--foreground))]">
+                {t(`landing.feature.${key}.title`)}
+              </h3>
+              <p className="text-xs text-[hsl(var(--muted-foreground))] leading-relaxed">
+                {t(`landing.feature.${key}.desc`)}
+              </p>
+            </div>
+          ))}
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-[hsl(var(--border))] px-6 py-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[hsl(var(--muted-foreground))]">
+          <span>AnyoneCMS &middot; {t('landing.footer')}</span>
+          <span>{t('landing.poweredBy')}</span>
+        </div>
+      </footer>
     </div>
   );
 }

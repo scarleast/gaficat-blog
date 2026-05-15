@@ -1,22 +1,44 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '@/lib/api';
-import { formatDate } from '@/lib/utils';
 import type { Build } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import {
   RefreshCw,
   FileText,
-  Settings,
   CheckCircle2,
   XCircle,
   Clock,
   Loader2,
   ExternalLink,
+  GitBranch,
+  Ban,
 } from 'lucide-react';
+
+function timeAgo(dateStr: string): string {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 1) return '刚刚';
+  if (minutes < 60) return `${minutes} 分钟前`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} 小时前`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days} 天前`;
+  return d.toLocaleDateString('zh-CN');
+}
+
+const statusConfig: Record<string, { icon: React.ElementType; color: string; label: string }> = {
+  pending: { icon: Clock, color: 'text-amber-500', label: '排队中' },
+  in_progress: { icon: Loader2, color: 'text-blue-500', label: '运行中' },
+  success: { icon: CheckCircle2, color: 'text-emerald-500', label: '成功' },
+  failure: { icon: XCircle, color: 'text-red-500', label: '失败' },
+  cancelled: { icon: Ban, color: 'text-zinc-400', label: '已取消' },
+  unknown: { icon: Clock, color: 'text-zinc-400', label: '未知' },
+};
 
 export function BuildsPage() {
   const { siteId } = useParams<{ siteId: string }>();
@@ -26,6 +48,7 @@ export function BuildsPage() {
 
   const loadBuilds = () => {
     if (!siteId) return;
+    setLoading(true);
     api.listBuilds(Number(siteId))
       .then((res) => setBuilds(res.builds || []))
       .catch(() => setBuilds([]))
@@ -39,16 +62,10 @@ export function BuildsPage() {
     setTriggering(true);
     try {
       await api.triggerBuild(Number(siteId));
-      loadBuilds();
+      // Refresh after a short delay to let GitHub pick up the dispatch
+      setTimeout(loadBuilds, 2000);
     } catch { /* ignore */ }
     finally { setTriggering(false); }
-  };
-
-  const statusConfig: Record<string, { icon: React.ElementType; variant: 'success' | 'destructive' | 'warning' | 'info'; label: string }> = {
-    pending: { icon: Clock, variant: 'warning', label: '等待中' },
-    in_progress: { icon: Loader2, variant: 'info', label: '进行中' },
-    success: { icon: CheckCircle2, variant: 'success', label: '成功' },
-    failure: { icon: XCircle, variant: 'destructive', label: '失败' },
   };
 
   return (
@@ -73,49 +90,15 @@ export function BuildsPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={loadBuilds}>
-            <RefreshCw className="h-4 w-4 mr-2" />刷新
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />刷新
           </Button>
           <Button size="sm" onClick={handleTrigger} disabled={triggering}>
-            {triggering ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+            {triggering && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
             {triggering ? '触发中...' : '触发构建'}
           </Button>
         </div>
       </div>
 
-      {/* Latest build highlight */}
-      {!loading && builds.length > 0 && (() => {
-        const latest = builds[0];
-        const cfg = statusConfig[latest.status] || statusConfig.pending;
-        const Icon = cfg.icon;
-        return (
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                    latest.status === 'success' ? 'bg-emerald-100 dark:bg-emerald-900/30' :
-                    latest.status === 'failure' ? 'bg-red-100 dark:bg-red-900/30' :
-                    'bg-blue-100 dark:bg-blue-900/30'
-                  }`}>
-                    <Icon className={`h-5 w-5 ${
-                      latest.status === 'success' ? 'text-emerald-600 dark:text-emerald-400' :
-                      latest.status === 'failure' ? 'text-red-600 dark:text-red-400' :
-                      'text-blue-600 dark:text-blue-400'
-                    } ${latest.status === 'in_progress' ? 'animate-spin' : ''}`} />
-                  </div>
-                  <div>
-                    <p className="font-medium text-[hsl(var(--foreground))]">最新构建</p>
-                    <p className="text-sm text-[hsl(var(--muted-foreground))]">#{latest.run_id || latest.id} · {formatDate(latest.triggered_at)}</p>
-                  </div>
-                </div>
-                <Badge variant={cfg.variant}>{cfg.label}</Badge>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })()}
-
-      {/* Build history */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[hsl(var(--primary))]" />
@@ -129,23 +112,42 @@ export function BuildsPage() {
       ) : (
         <div className="space-y-2">
           {builds.map((build) => {
-            const cfg = statusConfig[build.status] || statusConfig.pending;
+            const cfg = statusConfig[build.status] || statusConfig.unknown;
             const Icon = cfg.icon;
             return (
-              <Card key={build.id}>
+              <Card key={build.id} className="hover:shadow-sm transition-shadow">
                 <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Icon className={`h-4 w-4 ${
-                        build.status === 'success' ? 'text-emerald-600' :
-                        build.status === 'failure' ? 'text-red-500' :
-                        'text-blue-500'
-                      } ${build.status === 'in_progress' ? 'animate-spin' : ''}`} />
-                      <span className="text-sm text-[hsl(var(--muted-foreground))]">#{build.run_id || build.id}</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Icon className={`h-5 w-5 flex-shrink-0 ${cfg.color} ${build.status === 'in_progress' ? 'animate-spin' : ''}`} />
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-[hsl(var(--foreground))] truncate">{build.name || `#${build.run_id}`}</span>
+                          {build.branch && (
+                            <span className="flex items-center gap-0.5 text-xs text-[hsl(var(--muted-foreground))] flex-shrink-0">
+                              <GitBranch className="h-3 w-3" />{build.branch}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-[hsl(var(--muted-foreground))]">{timeAgo(build.triggered_at)}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Badge variant={cfg.variant} className="text-xs">{cfg.label}</Badge>
-                      <span className="text-xs text-[hsl(var(--muted-foreground))]">{formatDate(build.triggered_at)}</span>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <Badge
+                        variant={
+                          build.status === 'success' ? 'default' :
+                          build.status === 'failure' ? 'destructive' :
+                          'secondary'
+                        }
+                        className="text-xs"
+                      >
+                        {cfg.label}
+                      </Badge>
+                      {build.html_url && (
+                        <a href={build.html_url} target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors">
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      )}
                     </div>
                   </div>
                 </CardContent>

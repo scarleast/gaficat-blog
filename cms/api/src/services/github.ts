@@ -26,6 +26,19 @@ export async function listFiles(token: string, repo: string, path: string, branc
     }));
 }
 
+export async function getBlob(token: string, repo: string, sha: string): Promise<string> {
+  const res = await fetch(
+    `https://api.github.com/repos/${repo}/git/blobs/${sha}`,
+    { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json', 'User-Agent': 'gaficat-cms' } }
+  );
+  if (!res.ok) throw new Error(`GitHub Blob API error: ${res.status}`);
+  const data = await res.json<{ content: string; encoding: string }>();
+  if (data.encoding === 'base64') {
+    return new TextDecoder().decode(Uint8Array.from(atob(data.content.replace(/\n/g, '')), (c) => c.charCodeAt(0)));
+  }
+  return data.content;
+}
+
 export async function getFile(token: string, repo: string, path: string, branch: string): Promise<{ content: string; sha: string }> {
   const res = await fetch(
     `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}?ref=${branch}`,
@@ -92,13 +105,24 @@ export async function triggerDispatch(token: string, repo: string, eventType: st
   if (!res.ok && res.status !== 204) throw new Error(`GitHub API error: ${res.status}`);
 }
 
-export async function listWorkflowRuns(token: string, repo: string): Promise<Array<{ id: number; status: string; conclusion: string | null; created_at: string; updated_at: string }>> {
+export interface WorkflowRun {
+  id: number;
+  name: string;
+  head_branch: string;
+  status: string;
+  conclusion: string | null;
+  created_at: string;
+  updated_at: string;
+  html_url: string;
+}
+
+export async function listWorkflowRuns(token: string, repo: string, perPage = 15): Promise<WorkflowRun[]> {
   const res = await fetch(
-    `https://api.github.com/repos/${repo}/actions/runs?per_page=10`,
+    `https://api.github.com/repos/${repo}/actions/runs?per_page=${perPage}`,
     { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json', 'User-Agent': 'gaficat-cms' } }
   );
   if (!res.ok) return [];
-  const data = await res.json<{ workflow_runs: Array<{ id: number; status: string; conclusion: string | null; created_at: string; updated_at: string }> }>();
+  const data = await res.json<{ workflow_runs: WorkflowRun[] }>();
   return data.workflow_runs || [];
 }
 

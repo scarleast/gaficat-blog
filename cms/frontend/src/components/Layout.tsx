@@ -46,10 +46,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* Sidebar - desktop */}
       <aside className="hidden lg:flex lg:flex-col lg:w-60 border-r border-[hsl(var(--border))] bg-[hsl(var(--card))]">
         <div className="flex items-center gap-2 px-4 h-14 border-b border-[hsl(var(--border))]">
-          <div className="w-8 h-8 rounded-lg bg-[hsl(var(--primary))] flex items-center justify-center text-[hsl(var(--primary-foreground))] font-bold text-sm">
-            C
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+            A
           </div>
-          <span className="font-semibold text-[hsl(var(--foreground))]">CMS</span>
+          <span className="font-semibold text-[hsl(var(--foreground))]">AnyoneCMS</span>
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {navItems.map((item) => (
@@ -101,7 +101,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
           <aside className="fixed left-0 top-0 bottom-0 w-60 bg-[hsl(var(--card))] border-r border-[hsl(var(--border))] z-50">
             <div className="flex items-center justify-between px-4 h-14 border-b border-[hsl(var(--border))]">
-              <span className="font-semibold">CMS</span>
+              <span className="font-semibold">AnyoneCMS</span>
               <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
                 <X className="h-4 w-4" />
               </Button>

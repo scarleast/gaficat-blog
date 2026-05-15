@@ -15,6 +15,7 @@ import {
   Trash2,
   FolderOpen,
   Tag,
+  CalendarDays,
 } from 'lucide-react';
 
 interface PostMeta {
@@ -24,6 +25,7 @@ interface PostMeta {
   tags: string[];
   categories: string[];
   date: string;
+  updated: string;
 }
 
 export function PostsPage() {
@@ -41,17 +43,21 @@ export function PostsPage() {
     api.listPosts(Number(siteId))
       .then((res) => {
         setPosts(res.posts || []);
-        // Parse frontmatter from content for each post
-        // Since list endpoint doesn't return content, we use file names as titles
-        // and parse tags/categories from the file paths
-        const metas: PostMeta[] = (res.posts || []).map((p) => ({
-          path: p.path,
-          name: p.name,
-          title: p.name.replace(/\.(md|mdx)$/, '').replace(/-/g, ' '),
-          tags: [],
-          categories: extractCategoryFromPath(p.path),
-          date: '',
-        }));
+        const metas: PostMeta[] = (res.posts || []).map((p) => {
+          const fm = p.frontmatter || {};
+          const dateRaw = fm.date instanceof Date
+            ? fm.date.toISOString().replace('T', ' ').slice(0, 19)
+            : String(fm.date || '');
+          return {
+            path: p.path,
+            name: p.name,
+            title: String(fm.title || p.name.replace(/\.(md|mdx)$/, '').replace(/-/g, ' ')),
+            tags: Array.isArray(fm.tags) ? fm.tags.map(String) : [],
+            categories: fm.categories ? [String(fm.categories)] : extractCategoryFromPath(p.path),
+            date: dateRaw,
+            updated: fm.updated ? String(fm.updated) : dateRaw,
+          };
+        });
         setPostMetas(metas);
       })
       .catch(() => setPosts([]))
@@ -202,7 +208,10 @@ export function PostsPage() {
                         <div className="flex items-center justify-between">
                           <Link to={`/sites/${siteId}/posts/edit?path=${encodeURIComponent(post.path)}`} className="min-w-0 flex-1 hover:opacity-80">
                             <p className="font-medium text-[hsl(var(--foreground))] truncate">{post.title}</p>
-                            <p className="text-xs text-[hsl(var(--muted-foreground))]">{post.name}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              {post.date && <span className="flex items-center gap-0.5 text-xs text-[hsl(var(--muted-foreground))]"><CalendarDays className="h-3 w-3" />{post.date.slice(0, 10)}</span>}
+                              {post.tags.length > 0 && <span className="flex items-center gap-0.5 text-xs text-[hsl(var(--muted-foreground))]"><Tag className="h-3 w-3" />{post.tags.slice(0, 2).join(', ')}</span>}
+                            </div>
                           </Link>
                           <div className="flex items-center gap-1 ml-3">
                             <Link to={`/sites/${siteId}/posts/edit?path=${encodeURIComponent(post.path)}`}>
@@ -237,9 +246,14 @@ export function PostsPage() {
                     <Link to={`/sites/${siteId}/posts/edit?path=${encodeURIComponent(post.path)}`} className="min-w-0 flex-1 hover:opacity-80">
                       <p className="font-medium text-[hsl(var(--foreground))] truncate">{post.title}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-[hsl(var(--muted-foreground))]">{post.name}</span>
+                        {post.date && (
+                          <span className="flex items-center gap-0.5 text-xs text-[hsl(var(--muted-foreground))]"><CalendarDays className="h-3 w-3" />{post.date.slice(0, 10)}</span>
+                        )}
                         {post.categories.length > 0 && (
-                          <Badge variant="secondary" className="text-xs">{post.categories[0]}</Badge>
+                          <span className="flex items-center gap-0.5 text-xs text-[hsl(var(--muted-foreground))]"><FolderOpen className="h-3 w-3" />{post.categories[0]}</span>
+                        )}
+                        {post.tags.length > 0 && (
+                          <span className="flex items-center gap-0.5 text-xs text-[hsl(var(--muted-foreground))]"><Tag className="h-3 w-3" />{post.tags.slice(0, 2).join(', ')}</span>
                         )}
                       </div>
                     </Link>

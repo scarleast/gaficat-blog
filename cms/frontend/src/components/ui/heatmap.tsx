@@ -15,21 +15,27 @@ const COLORS = [
 ];
 
 const MONTH_LABELS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-const DAY_LABELS = ['日','一','二','三','四','五','六'];
+const DAY_LABELS = ['周日','周一','周二','周三','周四','周五','周六'];
 
 export function Heatmap({ data, months = 6 }: HeatmapProps) {
   const { weeks, maxCount, monthLabels } = useMemo(() => {
     const now = new Date();
+    // End at the end of the current week (Saturday)
     const endDate = new Date(now);
-    endDate.setDate(endDate.getDate() + (7 - endDate.getDay()) % 7);
-    const startDate = new Date(endDate);
-    startDate.setDate(startDate.getDate() - (months * 7 * 4 + 7));
+    endDate.setDate(endDate.getDate() + (6 - endDate.getDay()));
 
-    const weeks: { date: string; count: number; dayOfWeek: number }[][] = [];
-    const monthSet = new Set<string>();
-    let currentWeek: { date: string; count: number; dayOfWeek: number }[] = [];
+    // Start from Sunday, going back ~months*4 weeks
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - months * 7 * 4 - 6);
+    // Align to Sunday
+    startDate.setDate(startDate.getDate() - startDate.getDay());
+
+    type DayCell = { date: string; count: number; dayOfWeek: number } | null;
+    const weeks: DayCell[][] = [];
 
     const d = new Date(startDate);
+    let currentWeek: DayCell[] = [];
+
     while (d <= endDate) {
       const dayOfWeek = d.getDay();
       if (dayOfWeek === 0 && currentWeek.length > 0) {
@@ -38,16 +44,20 @@ export function Heatmap({ data, months = 6 }: HeatmapProps) {
       }
       const dateStr = d.toISOString().slice(0, 10);
       currentWeek.push({ date: dateStr, count: data[dateStr] || 0, dayOfWeek });
-      monthSet.add(`${d.getFullYear()}-${d.getMonth()}`);
       d.setDate(d.getDate() + 1);
     }
-    if (currentWeek.length > 0) weeks.push(currentWeek);
+    // Pad last week to 7 days
+    if (currentWeek.length > 0) {
+      while (currentWeek.length < 7) currentWeek.push(null);
+      weeks.push(currentWeek);
+    }
 
     const mc = Math.max(1, ...Object.values(data));
     const ml: { label: string; weekIndex: number }[] = [];
     let lastMonth = -1;
     weeks.forEach((week, i) => {
-      const firstDay = week[0];
+      const firstDay = week.find(c => c !== null);
+      if (!firstDay) return;
       const m = new Date(firstDay.date).getMonth();
       if (m !== lastMonth) {
         ml.push({ label: MONTH_LABELS[m], weekIndex: i });
@@ -68,7 +78,7 @@ export function Heatmap({ data, months = 6 }: HeatmapProps) {
     <div className="w-full overflow-x-auto">
       <div className="inline-block min-w-full">
         {/* Month labels */}
-        <div className="flex text-xs text-[hsl(var(--muted-foreground))] mb-1" style={{ paddingLeft: 28 }}>
+        <div className="flex text-xs text-[hsl(var(--muted-foreground))] mb-1" style={{ paddingLeft: 40 }}>
           {monthLabels.map((m, i) => (
             <span
               key={i}
@@ -81,10 +91,10 @@ export function Heatmap({ data, months = 6 }: HeatmapProps) {
         </div>
         <div className="flex">
           {/* Day labels */}
-          <div className="flex flex-col mr-1 text-xs text-[hsl(var(--muted-foreground))]">
-            {[1, 3, 5].map(d => (
-              <div key={d} className="h-[14px] flex items-center leading-none" style={{ marginTop: d === 1 ? 0 : 3 }}>
-                {DAY_LABELS[d]}
+          <div className="flex flex-col gap-[3px] text-xs text-[hsl(var(--muted-foreground))]">
+            {[0, 1, 2, 3, 4, 5, 6].map(d => (
+              <div key={d} className="h-[14px] flex items-center leading-none">
+                {[1, 3, 5].includes(d) ? DAY_LABELS[d] : ''}
               </div>
             ))}
           </div>
@@ -92,12 +102,16 @@ export function Heatmap({ data, months = 6 }: HeatmapProps) {
           <div className="flex gap-[3px]">
             {weeks.map((week, wi) => (
               <div key={wi} className="flex flex-col gap-[3px]">
-                {week.map((day) => (
-                  <div
-                    key={day.date}
-                    title={`${day.date}: ${day.count} 次提交`}
-                    className={cn('h-[14px] w-[14px] rounded-[2px] transition-colors', getColor(day.count))}
-                  />
+                {week.map((day, di) => (
+                  day ? (
+                    <div
+                      key={day.date}
+                      title={`${day.date}: ${day.count} 次提交`}
+                      className={cn('h-[14px] w-[14px] rounded-[2px] transition-colors', getColor(day.count))}
+                    />
+                  ) : (
+                    <div key={`empty-${di}`} className="h-[14px] w-[14px]" />
+                  )
                 ))}
               </div>
             ))}

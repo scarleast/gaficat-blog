@@ -52,11 +52,13 @@ export interface MediaFile {
 
 export interface Build {
   id: number;
-  site_id: number;
-  run_id: number | null;
-  status: 'pending' | 'in_progress' | 'success' | 'failure';
+  run_id: number;
+  name: string;
+  branch: string;
+  status: 'pending' | 'in_progress' | 'success' | 'failure' | 'cancelled' | 'unknown';
   triggered_at: string;
   completed_at: string | null;
+  html_url: string;
 }
 
 export interface ApiResponse<T = unknown> {

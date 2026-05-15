@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "CMS",
+    "title": "AnyoneCMS",
     "loading": "Loading..."
   },
   "nav": {
@@ -14,6 +14,33 @@
     "loginWithGitHub": "Sign in with GitHub",
     "loginDescription": "Sign in with your GitHub account to manage your static blog",
     "loggingIn": "Signing in..."
+  },
+  "landing": {
+    "badge": "Open Source CMS",
+    "title": "The CMS built for",
+    "titleHighlight": "static blogs",
+    "subtitle": "Powered by GitHub repositories, connecting your writing tools to the deploy pipeline. Write, publish, deploy — all in one place.",
+    "learnMore": "Learn More",
+    "footer": "Open Source Project",
+    "poweredBy": "Powered by Cloudflare Workers & GitHub API",
+    "feature": {
+      "git": {
+        "title": "Git-backed",
+        "desc": "Content lives in GitHub repos, fully versioned"
+      },
+      "markdown": {
+        "title": "Markdown First",
+        "desc": "MD/MDX support, custom frontmatter"
+      },
+      "deploy": {
+        "title": "One-click Deploy",
+        "desc": "CI/CD integrated, publish to go live"
+      },
+      "framework": {
+        "title": "Framework Agnostic",
+        "desc": "Works with Astro, Hugo, Hexo and more"
+      }
+    }
   },
   "dashboard": {
     "title": "Dashboard",

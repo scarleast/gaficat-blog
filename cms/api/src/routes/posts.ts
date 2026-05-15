@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import yaml from 'js-yaml';
 import { AppType, SiteRow } from '../types';
 import { authMiddleware } from '../middleware/auth';
 import { getUserToken } from '../services/auth';
@@ -16,7 +17,18 @@ async function getVerifiedSite(c: { env: { DB: D1Database }; get: (key: 'userId'
   return site;
 }
 
-// List posts
+// Parse frontmatter from raw markdown content
+function parseFrontmeta(content: string): Record<string, unknown> {
+  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) return {};
+  try {
+    return yaml.load(match[1], { schema: yaml.JSON_SCHEMA }) as Record<string, unknown> || {};
+  } catch {
+    return {};
+  }
+}
+
+// List posts — sorted by date descending
 posts.get('/', async (c) => {
   const siteId = Number(c.req.param('siteId'));
   const site = await getVerifiedSite(c, siteId);
@@ -27,10 +39,37 @@ posts.get('/', async (c) => {
 
   try {
     const files = await github.listFiles(token, site.repo_full_name, site.content_dir, site.branch);
-    const posts = files
-      .filter((f) => f.name.endsWith('.md') || f.name.endsWith('.mdx'))
-      .map((f) => ({ name: f.name, path: f.path, sha: f.sha, size: f.size, frontmatter: {}, content: '' }));
-    return c.json({ posts });
+    const mdFiles = files.filter((f) => f.name.endsWith('.md') || f.name.endsWith('.mdx'));
+
+    // Fetch frontmatter in parallel batches of 10
+    const BATCH = 10;
+    const enriched: Array<{ name: string; path: string; sha: string; size: number; frontmatter: Record<string, unknown>; content: string }> = [];
+    for (let i = 0; i < mdFiles.length; i += BATCH) {
+      const batch = mdFiles.slice(i, i + BATCH);
+      const results = await Promise.allSettled(
+        batch.map(async (f) => {
+          const raw = await github.getBlob(token, site.repo_full_name, f.sha);
+          const fm = parseFrontmeta(raw);
+          return { name: f.name, path: f.path, sha: f.sha, size: f.size, frontmatter: fm, content: '' };
+        })
+      );
+      results.forEach((r, idx) => {
+        if (r.status === 'fulfilled') enriched.push(r.value);
+        else {
+          const f = batch[idx];
+          enriched.push({ name: f.name, path: f.path, sha: f.sha, size: f.size, frontmatter: {}, content: '' });
+        }
+      });
+    }
+
+    // Sort by date descending (frontmatter date, fallback to 0)
+    enriched.sort((a, b) => {
+      const dateA = a.frontmatter.date ? new Date(a.frontmatter.date as string).getTime() : 0;
+      const dateB = b.frontmatter.date ? new Date(b.frontmatter.date as string).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    return c.json({ posts: enriched });
   } catch (e) {
     return c.json({ posts: [], error: (e as Error).message });
   }

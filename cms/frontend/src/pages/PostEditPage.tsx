@@ -1,31 +1,14 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { api } from '@/lib/api';
 import yaml from 'js-yaml';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { MarkdownPreview } from '@/components/ui/markdown-preview';
+import { VditorEditor, VditorEditorHandle } from '@/components/VditorEditor';
 import {
   Save,
   Send,
   ArrowLeft,
-  Bold,
-  Italic,
-  Heading2,
-  List,
-  ListOrdered,
-  Quote,
-  Code,
-  Link2,
-  Image,
-  Table,
-  FileCode,
-  Eye,
-  Columns,
+  Trash2,
 } from 'lucide-react';
 
 function splitFrontmatter(content: string): { frontmatter: string; body: string } {
@@ -53,10 +36,11 @@ function parseFrontmatterData(fmText: string): FrontmatterData {
     return { title: '', date: '', tags: [], categories: '', abbrlink: '', math: false, toc: true, sticky: 0, excerpt: '' };
   }
   try {
-    const parsed = yaml.load(match[1]) as Record<string, unknown>;
+    const parsed = yaml.load(match[1], { schema: yaml.JSON_SCHEMA }) as Record<string, unknown>;
+    const dateRaw = parsed.date instanceof Date ? parsed.date.toISOString().replace('T', ' ').slice(0, 19) : String(parsed.date || '');
     return {
       title: String(parsed.title || ''),
-      date: String(parsed.date || ''),
+      date: dateRaw,
       tags: Array.isArray(parsed.tags) ? parsed.tags.map(String) : [],
       categories: String(parsed.categories || ''),
       abbrlink: String(parsed.abbrlink || ''),
@@ -67,7 +51,7 @@ function parseFrontmatterData(fmText: string): FrontmatterData {
       ...Object.fromEntries(
         Object.entries(parsed).filter(([k]) =>
           !['title','date','tags','categories','abbrlink','math','toc','sticky','excerpt'].includes(k)
-        )
+        ).map(([k, v]) => [k, v instanceof Date ? v.toISOString().replace('T', ' ').slice(0, 19) : String(v)])
       ),
     };
   } catch {
@@ -91,7 +75,6 @@ function buildFrontmatterYaml(data: FrontmatterData): string {
   lines.push(`toc: ${data.toc}`);
   if (data.sticky) lines.push(`sticky: ${data.sticky}`);
   if (data.excerpt) lines.push(`excerpt: ${JSON.stringify(data.excerpt)}`);
-  // Preserve unknown fields
   const knownKeys = new Set(['title','date','tags','categories','abbrlink','math','toc','sticky','excerpt']);
   for (const [key, value] of Object.entries(data)) {
     if (!knownKeys.has(key) && value !== undefined && value !== '') {
@@ -115,11 +98,68 @@ export function PostEditPage() {
   });
   const [body, setBody] = useState('');
   const [sha, setSha] = useState('');
+  const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'source' | 'preview' | 'split'>('source');
   const [tagInput, setTagInput] = useState('');
+  const [newFieldKey, setNewFieldKey] = useState('');
+  const [newFieldValue, setNewFieldValue] = useState('');
+  const [showAddMenu, setShowAddMenu] = useState(false);
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const editorRef = useRef<VditorEditorHandle>(null);
+
+  const knownKeys = new Set(['title','date','tags','categories','abbrlink','math','toc','sticky','excerpt']);
+
+  const defaultVisible = ['date', 'categories', 'sticky', 'tags'];
+  const [visibleFields, setVisibleFields] = useState<string[]>(defaultVisible);
+
+  const allFieldKeys = useMemo(() => {
+    const keys = [...visibleFields];
+    Object.keys(fmData).forEach(k => {
+      if (!knownKeys.has(k) && !keys.includes(k)) keys.push(k);
+    });
+    return keys;
+  }, [visibleFields, fmData]);
+
+  const customFields = useMemo(() => {
+    return Object.entries(fmData).filter(([k]) => !knownKeys.has(k) && fmData[k] !== undefined) as [string, string][];
+  }, [fmData]);
+
+  const addableFields = useMemo(() => {
+    const all = ['date', 'categories', 'sticky', 'tags', 'toc', 'math', 'excerpt'];
+    return all.filter(k => !visibleFields.includes(k));
+  }, [visibleFields]);
+
+  const showField = (key: string) => {
+    if (!visibleFields.includes(key)) setVisibleFields([...visibleFields, key]);
+  };
+
+  const hideField = (key: string) => {
+    setVisibleFields(visibleFields.filter(k => k !== key));
+  };
+
+  const updateCustomField = (key: string, value: string) => {
+    setFmData({ ...fmData, [key]: value });
+  };
+
+  const removeCustomField = (key: string) => {
+    const next = { ...fmData };
+    delete next[key];
+    setFmData(next);
+    setVisibleFields(visibleFields.filter(k => k !== key));
+  };
+
+  const addCustomField = () => {
+    const key = newFieldKey.trim();
+    if (!key) return;
+    setFmData({ ...fmData, [key]: newFieldValue });
+    setNewFieldKey('');
+    setNewFieldValue('');
+    setShowAddMenu(false);
+    if (!visibleFields.includes(key)) setVisibleFields([...visibleFields, key]);
+  };
 
   useEffect(() => {
     if (!siteId || !postPath) return;
@@ -129,19 +169,32 @@ export function PostEditPage() {
         setFmData(parseFrontmatterData(frontmatter));
         setBody(b);
         setSha(res.post.sha);
+        setLoaded(true);
       })
       .catch(() => setMessage('加载失败'));
   }, [siteId, postPath]);
+
+  // Listen for dark mode changes
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setDark(document.documentElement.classList.contains('dark'));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   const save = async () => {
     if (!siteId) return;
     setSaving(true);
     setMessage('');
     try {
+      // Get latest content from vditor
+      const currentBody = editorRef.current?.getValue() ?? body;
       const fmYaml = buildFrontmatterYaml(fmData);
-      const content = fmYaml + '\n' + body;
+      const content = fmYaml + '\n' + currentBody;
       const res = await api.savePost(Number(siteId), postPath, content, sha);
       setSha(res.post.sha);
+      setBody(currentBody);
       setMessage('保存成功');
     } catch {
       setMessage('保存失败');
@@ -155,8 +208,9 @@ export function PostEditPage() {
     setPublishing(true);
     setMessage('');
     try {
+      const currentBody = editorRef.current?.getValue() ?? body;
       const fmYaml = buildFrontmatterYaml(fmData);
-      const content = fmYaml + '\n' + body;
+      const content = fmYaml + '\n' + currentBody;
       await api.savePost(Number(siteId), postPath, content, sha);
       await api.triggerBuild(Number(siteId));
       setMessage('发布成功，CI 已触发');
@@ -166,22 +220,6 @@ export function PostEditPage() {
       setPublishing(false);
     }
   };
-
-  // Toolbar action
-  const insert = useCallback((before: string, after: string, placeholder: string) => {
-    const ta = document.querySelector<HTMLTextAreaElement>('#editor-textarea');
-    if (!ta) return;
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    const selected = body.substring(start, end) || placeholder;
-    const newText = body.substring(0, start) + before + selected + after + body.substring(end);
-    setBody(newText);
-    requestAnimationFrame(() => {
-      ta.selectionStart = start + before.length;
-      ta.selectionEnd = start + before.length + selected.length;
-      ta.focus();
-    });
-  }, [body]);
 
   const addTag = () => {
     const tag = tagInput.trim();
@@ -195,161 +233,200 @@ export function PostEditPage() {
     setFmData({ ...fmData, tags: fmData.tags.filter(t => t !== tag) });
   };
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const ta = e.currentTarget;
-      const start = ta.selectionStart;
-      const end = ta.selectionEnd;
-      const val = ta.value;
-      setBody(val.substring(0, start) + '  ' + val.substring(end));
-      requestAnimationFrame(() => {
-        ta.selectionStart = ta.selectionEnd = start + 2;
-      });
+  // Hide app sidebar when editor is fullscreen
+  useEffect(() => {
+    const sidebar = document.querySelector('aside') as HTMLElement | null;
+    const header = document.querySelector('header') as HTMLElement | null;
+    if (isFullscreen) {
+      if (sidebar) sidebar.style.display = 'none';
+      if (header) header.style.display = 'none';
+      document.body.style.overflow = 'hidden';
+    } else {
+      if (sidebar) sidebar.style.display = '';
+      if (header) header.style.display = '';
+      document.body.style.overflow = '';
     }
-    if ((e.metaKey || e.ctrlKey) && e.key === 's') {
-      e.preventDefault();
-      save();
-    }
-  }, [body, save]);
-
-  const toolbarButtons = [
-    { icon: Bold, action: () => insert('**', '**', '粗体'), title: '加粗' },
-    { icon: Italic, action: () => insert('*', '*', '斜体'), title: '斜体' },
-    { icon: Heading2, action: () => insert('## ', '', '标题'), title: '标题' },
-    { icon: List, action: () => insert('- ', '', '列表项'), title: '无序列表' },
-    { icon: ListOrdered, action: () => insert('1. ', '', '列表项'), title: '有序列表' },
-    { icon: Quote, action: () => insert('> ', '', '引用'), title: '引用' },
-    { icon: Code, action: () => insert('`', '`', '代码'), title: '行内代码' },
-    { icon: Link2, action: () => insert('[', '](url)', '链接文本'), title: '链接' },
-    { icon: Image, action: () => insert('![', '](url)', '图片描述'), title: '图片' },
-    { icon: Table, action: () => insert('\n| 列1 | 列2 | 列3 |\n| --- | --- | --- |\n| ', ' | 数据 | 数据 |\n', '数据'), title: '表格' },
-  ];
+    return () => {
+      if (sidebar) sidebar.style.display = '';
+      if (header) header.style.display = '';
+      document.body.style.overflow = '';
+    };
+  }, [isFullscreen]);
 
   return (
-    <div className="space-y-4">
-      {/* Top bar */}
-      <div className="flex items-center justify-between">
-        <Link to={`/sites/${siteId}/posts`} className="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] flex items-center gap-1">
-          <ArrowLeft className="h-4 w-4" />返回列表
-        </Link>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={save} disabled={saving}>
-            <Save className="h-4 w-4 mr-1" />{saving ? '保存中...' : '保存'}
-          </Button>
-          <Button size="sm" onClick={publish} disabled={publishing}>
-            <Send className="h-4 w-4 mr-1" />{publishing ? '发布中...' : '发布'}
-          </Button>
+    <div className="notion-page">
+      {/* Sticky top bar — hidden in fullscreen */}
+      {!isFullscreen && (
+        <div className="notion-topbar">
+          <Link to={`/sites/${siteId}/posts`} className="text-xs text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] flex items-center gap-1 transition-colors">
+            <ArrowLeft className="h-3.5 w-3.5" />文章列表
+          </Link>
+          <div className="flex items-center gap-1.5">
+            <Button variant="ghost" size="sm" onClick={save} disabled={saving} className="h-7 text-xs gap-1">
+              <Save className="h-3.5 w-3.5" />{saving ? '保存中...' : '保存'}
+            </Button>
+            <Button size="sm" onClick={publish} disabled={publishing} className="h-7 text-xs gap-1">
+              <Send className="h-3.5 w-3.5" />{publishing ? '发布中...' : '发布'}
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
 
-      {message && (
-        <div className={`rounded-md px-4 py-2 text-sm ${
-          message.includes('失败') ? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-            : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400'
+      {message && !isFullscreen && (
+        <div className={`notion-toast ${
+          message.includes('失败') ? 'notion-toast--error' : 'notion-toast--success'
         }`}>
           {message}
         </div>
       )}
 
-      {/* Frontmatter Form */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm">文章元数据</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div>
-              <label className="block text-xs font-medium mb-1">标题</label>
-              <Input value={fmData.title} onChange={(e) => setFmData({ ...fmData, title: e.target.value })} placeholder="文章标题" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">日期</label>
-              <Input value={fmData.date} onChange={(e) => setFmData({ ...fmData, date: e.target.value })} placeholder="2024-01-01 12:00:00" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">分类</label>
-              <Input value={fmData.categories} onChange={(e) => setFmData({ ...fmData, categories: e.target.value })} placeholder="分类名称" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">标签</label>
-              <div className="flex gap-1.5 flex-wrap mb-1.5">
-                {fmData.tags.map(tag => (
-                  <Badge key={tag} variant="secondary" className="cursor-pointer hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-900/20" onClick={() => removeTag(tag)}>
-                    {tag} &times;
-                  </Badge>
-                ))}
-              </div>
-              <div className="flex gap-1">
-                <Input value={tagInput} onChange={(e) => setTagInput(e.target.value)} placeholder="添加标签" className="flex-1" onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())} />
-                <Button variant="outline" size="sm" onClick={addTag}>+</Button>
-              </div>
-            </div>
-            <div className="flex items-end gap-4">
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" checked={fmData.toc} onChange={(e) => setFmData({ ...fmData, toc: e.target.checked })} className="rounded" />
-                目录
-              </label>
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" checked={fmData.math} onChange={(e) => setFmData({ ...fmData, math: e.target.checked })} className="rounded" />
-                数学公式
-              </label>
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">置顶优先级</label>
-              <Input type="number" value={fmData.sticky || ''} onChange={(e) => setFmData({ ...fmData, sticky: Number(e.target.value) || 0 })} placeholder="0" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Notion-style page title — hidden in fullscreen */}
+      {!isFullscreen && (
+        <h1 className="notion-title">
+          <input
+            value={fmData.title}
+            onChange={(e) => setFmData({ ...fmData, title: e.target.value })}
+            placeholder="无标题"
+            className="w-full bg-transparent outline-none text-inherit placeholder:text-[hsl(var(--muted-foreground))]/30"
+          />
+        </h1>
+      )}
 
-      {/* Editor */}
-      <div className="border border-[hsl(var(--border))] rounded-xl overflow-hidden">
-        {/* Toolbar */}
-        <div className="flex items-center justify-between border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-1.5">
-          <div className="flex items-center gap-0.5">
-            {toolbarButtons.map((btn, i) => (
-              <Button key={i} variant="ghost" size="icon" className="h-7 w-7" onClick={btn.action} title={btn.title}>
-                <btn.icon className="h-3.5 w-3.5" />
-              </Button>
-            ))}
-          </div>
-          <div className="flex items-center gap-1">
-            <Button variant={activeTab === 'source' ? 'secondary' : 'ghost'} size="sm" className="h-7 text-xs" onClick={() => setActiveTab('source')}>
-              <FileCode className="h-3.5 w-3.5 mr-1" />源码
-            </Button>
-            <Button variant={activeTab === 'split' ? 'secondary' : 'ghost'} size="sm" className="h-7 text-xs" onClick={() => setActiveTab('split')}>
-              <Columns className="h-3.5 w-3.5 mr-1" />分屏
-            </Button>
-            <Button variant={activeTab === 'preview' ? 'secondary' : 'ghost'} size="sm" className="h-7 text-xs" onClick={() => setActiveTab('preview')}>
-              <Eye className="h-3.5 w-3.5 mr-1" />预览
-            </Button>
+      {/* Notion-style property row — hidden in fullscreen */}
+      {!isFullscreen && (
+        <div className="notion-props">
+          {allFieldKeys.map((key) => {
+            if (key === 'tags') return (
+              <div key={key} className="notion-prop">
+                <span className="notion-prop__label">标签</span>
+                <div className="notion-prop__value notion-prop__tags">
+                  {fmData.tags.map(tag => (
+                    <span
+                      key={tag}
+                      className="notion-tag group/tag"
+                      onClick={() => removeTag(tag)}
+                    >
+                      {tag}
+                      <svg className="notion-tag__remove" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </span>
+                  ))}
+                  <input
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') { e.preventDefault(); addTag(); }
+                      if (e.key === 'Backspace' && tagInput === '' && fmData.tags.length > 0) removeTag(fmData.tags[fmData.tags.length - 1]);
+                    }}
+                    placeholder={fmData.tags.length === 0 ? '添加...' : ''}
+                    className="notion-prop__input"
+                  />
+                </div>
+              </div>
+            );
+
+            if (!knownKeys.has(key)) return (
+              <div key={key} className="notion-prop">
+                <span className="notion-prop__label truncate" title={key}>{key}</span>
+                <input
+                  value={typeof fmData[key] === 'string' ? fmData[key] : String(fmData[key])}
+                  onChange={(e) => updateCustomField(key, e.target.value)}
+                  className="notion-prop__input"
+                />
+                <button className="notion-prop__remove" onClick={() => removeCustomField(key)}>
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              </div>
+            );
+
+            const labels: Record<string, string> = { date: '日期', categories: '分类', sticky: '置顶', toc: '目录', math: '数学', excerpt: '摘要' };
+            const placeholders: Record<string, string> = { date: '2024-01-01 12:00:00', categories: '分类名称', sticky: '0', toc: '', math: '', excerpt: '自定义摘要' };
+            const isToggle = key === 'toc' || key === 'math';
+
+            return (
+              <div key={key} className="notion-prop">
+                <span className="notion-prop__label">{labels[key] || key}</span>
+                {isToggle ? (
+                  <label className="notion-prop__toggle">
+                    <input type="checkbox" checked={Boolean(fmData[key as keyof FrontmatterData])} onChange={(e) => setFmData({ ...fmData, [key]: e.target.checked })} className="h-3.5 w-3.5 rounded accent-[hsl(var(--primary))]" />
+                    <span>{Boolean(fmData[key as keyof FrontmatterData]) ? '开启' : '关闭'}</span>
+                  </label>
+                ) : (
+                  <input
+                    type={key === 'sticky' ? 'number' : 'text'}
+                    value={String(fmData[key as keyof FrontmatterData] || '')}
+                    onChange={(e) => setFmData({ ...fmData, [key]: key === 'sticky' ? (Number(e.target.value) || 0) : e.target.value })}
+                    placeholder={placeholders[key] || ''}
+                    className="notion-prop__input [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                )}
+                <button className="notion-prop__remove" onClick={() => hideField(key)}>
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              </div>
+            );
+          })}
+
+          {/* Add property */}
+          <div className="relative">
+            <button
+              className="notion-prop__add"
+              onClick={() => setShowAddMenu(!showAddMenu)}
+            >+ 添加属性</button>
+            {showAddMenu && (
+              <div className="notion-prop__menu">
+                {addableFields.map(k => {
+                  const labels: Record<string, string> = { date: '日期', categories: '分类', sticky: '置顶', tags: '标签', toc: '目录', math: '数学公式', excerpt: '摘要' };
+                  return (
+                    <button key={k} className="notion-prop__menu-item" onClick={() => { showField(k); setShowAddMenu(false); }}>
+                      {labels[k] || k}
+                    </button>
+                  );
+                })}
+                {addableFields.length > 0 && customFields.length > 0 && <div className="border-t border-[hsl(var(--border))] my-1" />}
+                <div className="px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      value={newFieldKey}
+                      onChange={(e) => setNewFieldKey(e.target.value)}
+                      placeholder="键名"
+                      className="w-20 text-xs bg-transparent outline-none border-b border-[hsl(var(--border))] focus:border-[hsl(var(--primary))] placeholder:text-[hsl(var(--muted-foreground))]"
+                      onKeyDown={(e) => e.key === 'Enter' && addCustomField()}
+                    />
+                    <input
+                      value={newFieldValue}
+                      onChange={(e) => setNewFieldValue(e.target.value)}
+                      placeholder="值"
+                      className="flex-1 text-xs bg-transparent outline-none border-b border-[hsl(var(--border))] focus:border-[hsl(var(--primary))] placeholder:text-[hsl(var(--muted-foreground))]"
+                      onKeyDown={(e) => e.key === 'Enter' && addCustomField()}
+                    />
+                    <button className="text-xs text-[hsl(var(--primary))]" onClick={addCustomField}>确认</button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+      )}
 
-        {/* Editor area */}
-        <div className="flex" style={{ minHeight: 500 }}>
-          {(activeTab === 'source' || activeTab === 'split') && (
-            <textarea
-              id="editor-textarea"
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className={`bg-[hsl(var(--background))] text-sm font-mono leading-relaxed p-4 resize-none outline-none ${
-                activeTab === 'split' ? 'w-1/2 border-r border-[hsl(var(--border))]' : 'w-full'
-              }`}
-              style={{ minHeight: 500 }}
-              spellCheck={false}
-              placeholder="开始写作..."
-            />
-          )}
-          {(activeTab === 'preview' || activeTab === 'split') && (
-            <div className={`${activeTab === 'split' ? 'w-1/2' : 'w-full'} overflow-auto bg-[hsl(var(--background))]`}>
-              <MarkdownPreview content={body} />
-            </div>
-          )}
+      {/* Vditor WYSIWYG Editor — borderless, seamless with page */}
+      {loaded ? (
+        <div className="vditor-inset">
+          <VditorEditor
+            ref={editorRef}
+            value={body}
+            onChange={setBody}
+            onSave={save}
+            onFullscreenChange={setIsFullscreen}
+            dark={dark}
+            placeholder="开始写作..."
+            minHeight={500}
+          />
         </div>
-      </div>
+      ) : (
+        <div className="flex items-center justify-center" style={{ minHeight: 500 }}>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[hsl(var(--primary))]" />
+        </div>
+      )}
     </div>
   );
 }

@@ -43,7 +43,7 @@ builds.post('/trigger', async (c) => {
   }
 });
 
-// List builds
+// List builds — fetch directly from GitHub Actions
 builds.get('/', async (c) => {
   const siteId = Number(c.req.param('siteId'));
   const site = await getVerifiedSite(c, siteId);
@@ -52,22 +52,29 @@ builds.get('/', async (c) => {
   const token = await getUserToken(c.env.DB, c.get('userId'));
   if (!token) return c.json({ error: 'No token' }, 401);
 
-  // Sync with GitHub Actions
   try {
     const runs = await github.listWorkflowRuns(token, site.repo_full_name);
-    for (const run of runs.slice(0, 5)) {
-      await c.env.DB.prepare(
-        'UPDATE builds SET run_id = ?, status = ?, conclusion = ?, updated_at = datetime(\'now\') WHERE site_id = ? AND run_id = ?'
-      ).bind(run.id, run.status, run.conclusion, siteId, run.id).run();
-    }
-  } catch {
-    // Continue even if GitHub sync fails
+    // Map GitHub status/conclusion to a simpler build status
+    const builds = runs.map((run) => ({
+      id: run.id,
+      run_id: run.id,
+      name: run.name,
+      branch: run.head_branch,
+      status: run.conclusion === 'success' ? 'success'
+        : run.conclusion === 'failure' ? 'failure'
+        : run.conclusion === 'cancelled' ? 'cancelled'
+        : run.status === 'in_progress' ? 'in_progress'
+        : run.status === 'queued' ? 'pending'
+        : run.status === 'waiting' ? 'pending'
+        : run.status || 'unknown',
+      triggered_at: run.created_at,
+      completed_at: run.updated_at,
+      html_url: run.html_url,
+    }));
+    return c.json({ builds });
+  } catch (e) {
+    return c.json({ builds: [], error: (e as Error).message });
   }
-
-  const results = await c.env.DB.prepare(
-    'SELECT * FROM builds WHERE site_id = ? ORDER BY created_at DESC LIMIT 20'
-  ).bind(siteId).all();
-  return c.json({ builds: results.results });
 });
 
 export default builds;

@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "CMS",
+    "title": "AnyoneCMS",
     "loading": "加载中..."
   },
   "nav": {
@@ -14,6 +14,33 @@
     "loginWithGitHub": "使用 GitHub 登录",
     "loginDescription": "通过 GitHub 账号登录以管理你的静态博客",
     "loggingIn": "正在登录..."
+  },
+  "landing": {
+    "badge": "开源内容管理系统",
+    "title": "为静态博客打造的",
+    "titleHighlight": "内容管理系统",
+    "subtitle": "基于 GitHub 仓库，连接你的写作工具与部署流程。写作、发布、部署一站完成。",
+    "learnMore": "了解更多",
+    "footer": "开源项目",
+    "poweredBy": "Powered by Cloudflare Workers & GitHub API",
+    "feature": {
+      "git": {
+        "title": "Git 驱动",
+        "desc": "内容存储在 GitHub 仓库，版本可追溯"
+      },
+      "markdown": {
+        "title": "Markdown 优先",
+        "desc": "支持 MD/MDX，Frontmatter 自定义"
+      },
+      "deploy": {
+        "title": "一键部署",
+        "desc": "对接 CI/CD，发布即构建上线"
+      },
+      "framework": {
+        "title": "框架无关",
+        "desc": "支持 Astro、Hugo、Hexo 等主流框架"
+      }
+    }
   },
   "dashboard": {
     "title": "仪表盘",
